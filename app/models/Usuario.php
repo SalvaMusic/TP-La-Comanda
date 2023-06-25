@@ -31,7 +31,7 @@ class Usuario
             $consulta = $objAccesoDatos->prepararConsulta($query);
             $consulta->bindValue(':id', $this->id, PDO::PARAM_INT);
         }
-        
+
         $claveHash = password_hash($this->clave, PASSWORD_DEFAULT);
         $consulta->bindValue(':nombre', $this->nombre, PDO::PARAM_STR);
         $consulta->bindValue(':apellido', $this->apellido, PDO::PARAM_STR);
@@ -47,7 +47,7 @@ class Usuario
     public static function obtenerTodos()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, nombre, apellido, email, clave, roll, sector FROM usuario");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, nombre, apellido, email, clave, roll, sector, fechaAlta, fechaBaja FROM usuario");
         $consulta->execute();
 
         return $consulta->fetchAll(PDO::FETCH_CLASS, 'Usuario');
@@ -56,7 +56,7 @@ class Usuario
     public static function obtenerUsuario($id)
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, nombre, apellido, email, clave, roll, sector FROM usuario WHERE id = :id");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, nombre, apellido, email, clave, roll, sector, fechaAlta, fechaBaja FROM usuario WHERE id = :id");
         $consulta->bindValue(':id', $id, PDO::PARAM_INT);
         $consulta->execute();
 

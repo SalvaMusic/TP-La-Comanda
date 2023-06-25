@@ -1,23 +1,16 @@
 <?php
 
-class Pedido
+class Mesa
 {
     public $id;
-    public $usuarioId;
     public $estado;
-    public $codPedido;
-    public $sector;
-    public $detallePedidos;
     public $foto;
 
     public function crearUsuario()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO usuarios (estado, codPedido) VALUES (:email, :clave)");
+        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO usuarios (estado, foto) VALUES (:estado, :foto)");
         $consulta->bindValue(':email', $this->estado, PDO::PARAM_STR);
-        $consulta->bindValue(':email', $this->codPedido, PDO::PARAM_STR);
-        $consulta->bindValue(':email', $this->sector, PDO::PARAM_STR);
-        $consulta->bindValue(':email', $this->items, PDO::PARAM_INT);
         $consulta->bindValue(':email', $this->foto, PDO::PARAM_STR);
         $consulta->execute();
 
