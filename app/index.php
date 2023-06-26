@@ -3,7 +3,7 @@
 
 // https://github.com/BelPaiz/api-comanda/tree/main
 // https://github.com/TomasBustamante92/tpProg3/tree/main
-//php -S localhost:666 -t app
+// php -S localhost:666 -t app
 error_reporting(-1);
 ini_set('display_errors', 1);
 
@@ -22,8 +22,8 @@ require_once './db/AccesoDatos.php';
 require_once './controllers/UsuarioController.php';
 
 // Load ENV
-// $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-// $dotenv->safeLoad();
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->safeLoad();
 
 // Instantiate App
 $app = AppFactory::create();
@@ -50,7 +50,7 @@ $app->group('/credenciales', function (RouteCollectorProxy $group) {
 });
 
 $app->get('[/]', function (Request $request, Response $response) {    
-    $payload = json_encode(array("mensaje" => "Slim Framework 4 PHP"));
+    $payload = json_encode(array("mensaje" => "Slim Framework 4 ssPHP"));
     
     $response->getBody()->write($payload);
     return $response->withHeader('Content-Type', 'application/json');
