@@ -9,16 +9,26 @@ class Usuario
     public $clave;
     public $roll;
     public $sector;
-    public $fechaAlta;
+    public $fechaRegistro;
     public $fechaBaja;
+
+    public function __construct($nombre, $apellido, $email, $clave = null, $roll = null, $sector = null, $fechaRegistro = null)
+    {
+        $this->nombre = $nombre;
+        $this->apellido = $apellido;
+        $this->email = $email;
+        $this->clave = $clave;
+        $this->sector = $sector;
+        $this->roll = $roll;
+        $this->fechaRegistro = $fechaRegistro != null ? $fechaRegistro : new DateTime(date("d-m-Y"));        
+    }
 
     public function guardarUsuario()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         if($this->id == null){
-            $fechaAlta = $this->fechaAlta != null ? $this->fechaAlta : new DateTime(date("d-m-Y"));
-            $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO usuarios (nombre, apellido, email, clave, roll, sector, fechaAlta) VALUES (:nombre, :apellido, :email, :clave, :roll, :sector, :fechaAlta)");
-            $consulta->bindValue(':fechaAlta', date_format($fechaAlta, 'Y-m-d H:i:s'));
+            $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO usuarios (nombre, apellido, email, clave, roll, sector, fechaRegistro) VALUES (:nombre, :apellido, :email, :clave, :roll, :sector, :fechaRegistro)");
+            $consulta->bindValue(':fechaRegistro', date_format($this->fechaRegistro, 'Y-m-d H:i:s'));
         } else {
             $query = "UPDATE usuario SET 
                 nombre = :nombre,
