@@ -28,8 +28,6 @@ require_once './controllers/UsuarioController.php';
 // Instantiate App
 $app = AppFactory::create();
 
-//$app->setBasePath('/app');
-
 // Add error middleware
 $app->addErrorMiddleware(true, true, true);
 

@@ -9,6 +9,16 @@ class Producto
     public $stock;
     public $tiempoDePreparacion;
 
+
+    public function __construct($nombre, $sector, $precio, $stock = null, $tiempoDePreparacion = null)
+    {
+        $this->nombre = $nombre;
+        $this->sector = $sector;
+        $this->precio = $precio;
+        $this->stock = $stock;
+        $this->tiempoDePreparacion = $tiempoDePreparacion;    
+    }
+
     public function guardarProducto()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();

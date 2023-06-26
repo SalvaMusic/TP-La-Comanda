@@ -12,7 +12,7 @@ class DetallePedido
     public function crearDetallePedido()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO detalle_pedido (pedidoId, productoId, cantidad, estado, sector) VALUES (:pedidoId, :productoId, :cantidad, :estado, :sector)");
+        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO detalle_pedido (pedido_id, producto_id, cantidad, estado, sector) VALUES (:pedidoId, :productoId, :cantidad, :estado, :sector)");
         $consulta->bindValue(':pedidoId', $this->pedidoId, PDO::PARAM_INT);
         $consulta->bindValue(':productoId', $this->productoId, PDO::PARAM_INT);
         $consulta->bindValue(':cantidad', $this->cantidad, PDO::PARAM_INT);
@@ -35,7 +35,7 @@ class DetallePedido
     public static function obtenerTodos()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, pedidoId, productoId, cantidad, estado, sector FROM detalle_pedido");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, pedido_id, producto_id, cantidad, estado, sector FROM detalle_pedido");
         $consulta->execute();
 
         return $consulta->fetchAll(PDO::FETCH_CLASS, 'DetallePedido');
@@ -44,7 +44,7 @@ class DetallePedido
     public static function obtenerDetallePedido($pedidoId, $sector)
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, pedidoId, productoId, cantidad, estado, sector FROM detalle_pedido WHERE pedidoId = :pedidoId");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, pedido_id, producto_id, cantidad, estado, sector FROM detalle_pedido WHERE pedido_id = :pedidoId");
         $consulta->bindValue(':pedidoId', $pedidoId, PDO::PARAM_INT);
         $consulta->bindValue(':sector', $sector, PDO::PARAM_STR);
         $consulta->execute();
