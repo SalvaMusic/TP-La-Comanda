@@ -1,8 +1,6 @@
 <?php
 // Error Handling
 
-// https://github.com/BelPaiz/api-comanda/tree/main
-// https://github.com/TomasBustamante92/tpProg3/tree/main
 // php -S localhost:666 -t app
 error_reporting(-1);
 ini_set('display_errors', 1);
