@@ -10,10 +10,10 @@ class Encuesta
     public $puntCocinero;
     public $detalle;
 
-    public function crearEncuesta()
+    public function guardar()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO encuesta (pedido_id, punt_mesa, punt_restaurant, punt_mozo, punt_cocinero, detalle) VALUES (:pedidoId, :punt_mesa, :puntRestaurant, :puntMozo, :puntCocinero, :detalle)");
+        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO encuesta (pedidoId, puntMesa, puntRestaurant, puntMozo, puntCocinero, detalle) VALUES (:pedidoId, :puntMesa, :puntRestaurant, :puntMozo, :puntCocinero, :detalle)");
         $consulta->bindValue(':pedidoId', $this->pedidoId, PDO::PARAM_INT);
         $consulta->bindValue(':puntMesa', $this->puntMesa);
         $consulta->bindValue(':puntRestaurant', $this->puntRestaurant);
@@ -28,7 +28,7 @@ class Encuesta
     public static function obtenerTodos()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, pedidoId, punt_mesa, punt_restaurant, punt_mozo, punt_cocinero, detalle FROM encuesta");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT * FROM encuesta");
         $consulta->execute();
 
         return $consulta->fetchAll(PDO::FETCH_CLASS, 'Encuesta');
@@ -37,7 +37,7 @@ class Encuesta
     public static function obtenerEncuesta($pedido)
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, pedido_Id, punt_mesa, punt_restaurant, punt_mozo, punt_cocinero, detalle FROM encuesta WHERE pedido_id = :pedido");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT * FROM encuesta WHERE pedidoId = :pedido");
         $consulta->bindValue(':pedido', $pedido, PDO::PARAM_STR);
         $consulta->execute();
 

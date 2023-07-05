@@ -5,11 +5,6 @@ class Mesa
     public $id;
     public $estado;
 
-
-    public function __construct($estado = null) {
-        $this->estado = $estado;
-    }
-
     public function crearMesa()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();

@@ -29,8 +29,8 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `detalle_pedido` (
   `id` int(11) NOT NULL,
-  `pedido_id` int(11) NOT NULL,
-  `producto_id` int(11) NOT NULL,
+  `pedidoId` int(11) NOT NULL,
+  `productoId` int(11) NOT NULL,
   `cantidad` int(11) NOT NULL,
   `estado` varchar(50) NOT NULL,
   `sector` varchar(50) NOT NULL
@@ -44,11 +44,11 @@ CREATE TABLE `detalle_pedido` (
 
 CREATE TABLE `encuesta` (
   `id` int(11) NOT NULL,
-  `pedido_id` int(11) NOT NULL,
-  `punt_mesa` int(11) NOT NULL,
-  `punt_restaurant` int(11) NOT NULL,
-  `punt_mozo` int(11) NOT NULL,
-  `punt_cocinero` int(11) NOT NULL,
+  `pedidoId` int(11) NOT NULL,
+  `puntMesa` int(11) NOT NULL,
+  `puntRestaurant` int(11) NOT NULL,
+  `puntMozo` int(11) NOT NULL,
+  `puntCocinero` int(11) NOT NULL,
   `detalle` varchar(66) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -83,10 +83,10 @@ INSERT INTO `mesa` (`id`, `estado`) VALUES
 
 CREATE TABLE `pedido` (
   `id` int(11) NOT NULL,
-  `usuario_id` int(11) NOT NULL,
+  `usuarioId` int(11) NOT NULL,
   `estado` varchar(50) NOT NULL,
-  `cod_pedido` varchar(5) NOT NULL,
-  `mesa_id` int(11) NOT NULL,
+  `codPedido` varchar(5) NOT NULL,
+  `mesaId` int(11) NOT NULL,
   `inicio` date NOT NULL,
   `fin` date DEFAULT NULL,
   `foto` varchar(255) DEFAULT NULL
@@ -104,14 +104,14 @@ CREATE TABLE `producto` (
   `sector` varchar(50) NOT NULL,
   `precio` float DEFAULT NULL,
   `stock` int(11) NOT NULL,
-  `tiempo_preparacion` time DEFAULT NULL
+  `tiempoPreparacion` time DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `producto`
 --
 
-INSERT INTO `producto` (`id`, `nombre`, `sector`, `precio`, `stock`, `tiempo_preparacion`) VALUES
+INSERT INTO `producto` (`id`, `nombre`, `sector`, `precio`, `stock`, `tiempoPreparacion`) VALUES
 (1, 'Pizza - Muzza', 'Cocinero', 1000, 10, '00:30:00'),
 (3, 'Pizza - Especial', 'Cocinero', 1200, 10, '00:00:35'),
 (5, 'Pizza - Peperoni', 'Cocinero', 1500, 10, '00:00:40'),
@@ -142,12 +142,12 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id`, `nombre`, `apellido`, `email`, `clave`, `roll`, `sector`, `fechaRegistro`, `fechaBaja`) VALUES
-(1, 'Salvador', 'Pedrozo', 'Salva.7693@gmail.com', '1234', 'Admin', NULL, '2023-06-26', NULL),
-(2, 'Esteban', 'Pedrozo', 'esteban@gmail.com', '1234', 'Empleado', 'Mozo', '2023-06-26', NULL),
-(3, 'Makarena', 'Jara', 'maka@gmail.com', '1234', 'Empleado', 'Bartender', '2023-06-26', NULL),
-(4, 'Yesica', 'Contreras', 'yesi@gmail.com', '1234', 'Empleado', 'Cocinero', '2023-06-26', NULL),
-(5, 'Ale', 'Florentin', 'ale@gmail.com', '1234', 'Empleado', 'Cervecero', '2023-06-26', NULL),
-(6, 'Esteban', 'Pedrozo', 'esteban@gmail.com', '1234', 'Empleado', 'Mozo', '2023-06-26', NULL);
+(1, 'Salvador', 'Pedrozo', 'Salva.7693@gmail.com', '1234', 'Admin', NULL, '26-06-2022', NULL),
+(2, 'Esteban', 'Pedrozo', 'esteban@gmail.com', '1234', 'Empleado', 'Mozo', '15-03-2023', NULL),
+(3, 'Makarena', 'Jara', 'maka@gmail.com', '1234', 'Empleado', 'Bartender', '26-09-2022', NULL),
+(4, 'Yesica', 'Contreras', 'yesi@gmail.com', '1234', 'Empleado', 'Cocinero', '20-11-2022', NULL),
+(5, 'Ale', 'Florentin', 'ale@gmail.com', '1234', 'Empleado', 'Cervecero', '22-02-2023', NULL),
+(6, 'Esteban', 'Pedrozo', 'esteban@gmail.com', '1234', 'Empleado', 'Mozo', '26-06-2022', NULL);
 
 --
 -- Índices para tablas volcadas

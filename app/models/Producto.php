@@ -10,24 +10,16 @@ class Producto
     public $tiempoDePreparacion;
 
 
-    public function __construct($nombre, $sector, $precio, $stock = null, $tiempoDePreparacion = null)
-    {
-        $this->nombre = $nombre;
-        $this->sector = $sector;
-        $this->precio = $precio;
-        $this->stock = $stock;
-        $this->tiempoDePreparacion = $tiempoDePreparacion;    
-    }
 
-    public function guardarProducto()
+    public function guardar()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO producto (nombre, sector, precio, stock, tiempoDePreparacion) VALUES (:nombre, :sector, :precio, :stock, :tiempoDePreparacion)");
         $consulta->bindValue(':nombre', $this->nombre, PDO::PARAM_STR);
         $consulta->bindValue(':sector', $this->sector, PDO::PARAM_STR);
-        $consulta->bindValue(':precio', $this->precio, PDO::PARAM_STR);
-        $consulta->bindValue(':stock', $this->stock, PDO::PARAM_STR);
-        $consulta->bindValue(':tiempoDePreparacion', $this->tiempoDePreparacion, PDO::PARAM_STR);
+        $consulta->bindValue(':precio', $this->precio);
+        $consulta->bindValue(':stock', $this->stock, PDO::PARAM_INT);
+        $consulta->bindValue(':tiempoDePreparacion', $this->tiempoDePreparacion, PDO::PARAM_INT);
         $consulta->execute();
 
         return $objAccesoDatos->obtenerUltimoId();
@@ -45,7 +37,7 @@ class Producto
     public static function obtenerProducto($id)
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, nombre, tipoUsuario, precio, stock, tiempoDePreparacion FROM producto WHERE id = :id");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT * FROM producto WHERE id = :id");
         $consulta->bindValue(':id', $id, PDO::PARAM_INT);
         $consulta->execute();
 
