@@ -9,8 +9,6 @@ class Producto
     public $stock;
     public $tiempoDePreparacion;
 
-
-
     public function guardar()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
