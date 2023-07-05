@@ -112,12 +112,15 @@ CREATE TABLE `producto` (
 --
 
 INSERT INTO `producto` (`id`, `nombre`, `sector`, `precio`, `stock`, `tiempoPreparacion`) VALUES
-(1, 'Pizza - Muzza', 'Cocinero', 1000, 10, '00:30:00'),
-(3, 'Pizza - Especial', 'Cocinero', 1200, 10, '00:00:35'),
-(5, 'Pizza - Peperoni', 'Cocinero', 1500, 10, '00:00:40'),
-(6, 'Cerveza - Quilmes', 'Cervecero', 600, 50, '00:05:00'),
-(7, 'Cerveza - Brama', 'Cervecero', 600, 50, '00:05:00'),
-(8, 'Cerveza - Artesanal', 'Cervecero', 600, 50, '00:05:00');
+(1, 'Pizza - Muzza', 'Cocina', 1000, 10, '00:30:00'),
+(3, 'Pizza - Especial', 'Cocina', 1200, 10, '00:30:00'),
+(5, 'Pizza - Peperoni', 'Cocina', 1500, 10, '00:30:00'),
+(6, 'Cerveza - Quilmes', 'Cervecería', 600, 80, '00:05:00'),
+(7, 'Cerveza - Brama', 'Cervecería', 600, 80, '00:05:00'),
+(8, 'Cerveza - Artesanal', 'Cervecería', 600, 80, '00:05:00');
+(9, 'Vino Blanco', 'Barra', 900, 80, '00:05:00');
+(10, 'Vino Tinto', 'Barra', 900, 80, '00:05:00');
+(11, 'Flan', 'Cocina', 500, 80, '00:05:00');
 
 -- --------------------------------------------------------
 
@@ -131,7 +134,7 @@ CREATE TABLE `usuario` (
   `apellido` varchar(100) NOT NULL,
   `email` varchar(150) NOT NULL,
   `clave` varchar(20) DEFAULT NULL,
-  `roll` varchar(20) NOT NULL,
+  `role` varchar(20) NOT NULL,
   `sector` varchar(20) DEFAULT NULL,
   `fechaRegistro` date NOT NULL,
   `fechaBaja` date DEFAULT NULL
@@ -141,14 +144,13 @@ CREATE TABLE `usuario` (
 -- Volcado de datos para la tabla `usuario`
 --
 
-INSERT INTO `usuario` (`id`, `nombre`, `apellido`, `email`, `clave`, `roll`, `sector`, `fechaRegistro`, `fechaBaja`) VALUES
+INSERT INTO `usuario` (`id`, `nombre`, `apellido`, `email`, `clave`, `role`, `sector`, `fechaRegistro`, `fechaBaja`) VALUES
 (1, 'Salvador', 'Pedrozo', 'Salva.7693@gmail.com', '1234', 'Admin', NULL, '26-06-2022', NULL),
 (2, 'Esteban', 'Pedrozo', 'esteban@gmail.com', '1234', 'Empleado', 'Mozo', '15-03-2023', NULL),
-(3, 'Makarena', 'Jara', 'maka@gmail.com', '1234', 'Empleado', 'Bartender', '26-09-2022', NULL),
-(4, 'Yesica', 'Contreras', 'yesi@gmail.com', '1234', 'Empleado', 'Cocinero', '20-11-2022', NULL),
-(5, 'Ale', 'Florentin', 'ale@gmail.com', '1234', 'Empleado', 'Cervecero', '22-02-2023', NULL),
+(3, 'Makarena', 'Jara', 'maka@gmail.com', '1234', 'Empleado', 'Barra', '26-09-2022', NULL),
+(4, 'Yesica', 'Contreras', 'yesi@gmail.com', '1234', 'Empleado', 'Cocina', '20-11-2022', NULL),
+(5, 'Ale', 'Florentin', 'ale@gmail.com', '1234', 'Empleado', 'Cervecería', '22-02-2023', NULL),
 (6, 'Esteban', 'Pedrozo', 'esteban@gmail.com', '1234', 'Empleado', 'Mozo', '26-06-2022', NULL);
-
 --
 -- Índices para tablas volcadas
 --

@@ -7,7 +7,7 @@ class Usuario
     public $apellido;
     public $email;
     public $clave;
-    public $roll;
+    public $role_;
     public $sector;
     public $fechaRegistro;
     public $fechaBaja;
@@ -16,14 +16,14 @@ class Usuario
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         if($this->id == null){
-            $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO usuario (nombre, apellido, email, clave, roll, sector, fechaRegistro) VALUES (:nombre, :apellido, :email, :clave, :roll, :sector, :fechaRegistro)");
+            $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO usuario (nombre, apellido, email, clave, role_, sector, fechaRegistro) VALUES (:nombre, :apellido, :email, :clave, :role_, :sector, :fechaRegistro)");
             $consulta->bindValue(':fechaRegistro',$this->fechaRegistro);
         } else {
             $query = "UPDATE usuario SET 
                 nombre = :nombre,
                 apellido = :apellido,
                 email = :email,
-                roll = :roll,
+                role_ = :role_,
                 sector = :sector, 
                 clave = :clave
                 WHERE id = :id";
@@ -34,7 +34,7 @@ class Usuario
         $consulta->bindValue(':nombre', $this->nombre, PDO::PARAM_STR);
         $consulta->bindValue(':apellido', $this->apellido, PDO::PARAM_STR);
         $consulta->bindValue(':email', $this->email, PDO::PARAM_STR);
-        $consulta->bindValue(':roll', $this->roll, PDO::PARAM_STR);
+        $consulta->bindValue(':role_', $this->role_, PDO::PARAM_STR);
         $consulta->bindValue(':sector', $this->sector, PDO::PARAM_STR);
         $consulta->bindValue(':clave', $this->clave);
         $consulta->execute();

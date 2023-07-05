@@ -12,12 +12,16 @@ class UsuarioController extends Usuario implements IApiUsable
         $nombre = $parametros['nombre'];
         $apellido = $parametros['apellido'];
         $clave = $parametros['clave'];
+        $role = $parametros['role'];
+        $sector = $parametros['sector'];
 
         // Creamos el usuario
         $usr = new Usuario();
         $usr->nombre = $nombre;
         $usr->apellido = $apellido;
         $usr->email = $email;
+        $usr->role = getRole($role);
+        $usr->sector = getSector($sector);
         $usr->clave = password_hash($clave, PASSWORD_DEFAULT);
         $usr->guardar();
 
@@ -76,5 +80,23 @@ class UsuarioController extends Usuario implements IApiUsable
         $response->getBody()->write($payload);
         return $response
           ->withHeader('Content-Type', 'application/json');
+    }
+
+    private function getRole($role){
+      return strcasecmp(ROLL_ADMIN, $role) ? ROLL_ADMIN : ROLL_EMPLEADO;
+    }
+
+    private function getSector($sector){
+      if(strcasecmp(SECTOR_COCINA, $sector)){
+        return SECTOR_COCINA;
+      } else if(strcasecmp(SECTOR_CERVECERIA, $sector)){
+        return SECTOR_CERVECERIA;
+      } else if(strcasecmp(SECTOR_BAR, $sector)){
+        return SECTOR_BAR;
+      } else if(strcasecmp(SECTOR_MOZO, $sector)){
+        return SECTOR_MOZO;
+      }
+
+      return null;
     }
 }
