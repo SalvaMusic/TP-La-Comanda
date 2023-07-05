@@ -34,7 +34,7 @@ class Mesa
         return $consulta->fetchObject('Mesa');
     }
 
-    public function persistirEstado()
+    public function guardarEstado()
     {
         $objAccesoDato = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDato->prepararConsulta("UPDATE mesa SET estado = :estado WHERE id = :id");

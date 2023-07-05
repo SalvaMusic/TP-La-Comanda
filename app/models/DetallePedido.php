@@ -23,7 +23,7 @@ class DetallePedido
         return $objAccesoDatos->obtenerUltimoId();
     }
 
-    public function modificarEstado()
+    public function guardarEstado()
     {
         $objAccesoDato = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDato->prepararConsulta("UPDATE detalle_pedido SET estado = :estado WHERE id = :id");
