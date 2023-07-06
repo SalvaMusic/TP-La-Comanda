@@ -63,18 +63,6 @@ CREATE TABLE `mesa` (
   `estado` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Volcado de datos para la tabla `mesa`
---
-
-INSERT INTO `mesa` (`id`, `estado`) VALUES
-(1, 'Cerrada'),
-(2, 'Cerrada'),
-(3, 'Cerrada'),
-(4, 'Cerrada'),
-(5, 'Cerrada'),
-(6, 'Cerrada');
-
 -- --------------------------------------------------------
 
 --
@@ -111,17 +99,6 @@ CREATE TABLE `producto` (
 -- Volcado de datos para la tabla `producto`
 --
 
-INSERT INTO `producto` (`id`, `nombre`, `sector`, `precio`, `stock`, `tiempoPreparacion`) VALUES
-(1, 'Pizza - Muzza', 'Cocina', 1000, 10, '00:30:00'),
-(3, 'Pizza - Especial', 'Cocina', 1200, 10, '00:30:00'),
-(5, 'Pizza - Peperoni', 'Cocina', 1500, 10, '00:30:00'),
-(6, 'Cerveza - Quilmes', 'Cervecería', 600, 80, '00:05:00'),
-(7, 'Cerveza - Brama', 'Cervecería', 600, 80, '00:05:00'),
-(8, 'Cerveza - Artesanal', 'Cervecería', 600, 80, '00:05:00');
-(9, 'Vino Blanco', 'Barra', 900, 80, '00:05:00');
-(10, 'Vino Tinto', 'Barra', 900, 80, '00:05:00');
-(11, 'Flan', 'Cocina', 500, 80, '00:05:00');
-
 -- --------------------------------------------------------
 
 --
@@ -140,17 +117,6 @@ CREATE TABLE `usuario` (
   `fechaBaja` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Volcado de datos para la tabla `usuario`
---
-
-INSERT INTO `usuario` (`id`, `nombre`, `apellido`, `email`, `clave`, `role`, `sector`, `fechaRegistro`, `fechaBaja`) VALUES
-(1, 'Salvador', 'Pedrozo', 'Salva.7693@gmail.com', '1234', 'Admin', NULL, '26-06-2022', NULL),
-(2, 'Esteban', 'Pedrozo', 'esteban@gmail.com', '1234', 'Empleado', 'Mozo', '15-03-2023', NULL),
-(3, 'Makarena', 'Jara', 'maka@gmail.com', '1234', 'Empleado', 'Barra', '26-09-2022', NULL),
-(4, 'Yesica', 'Contreras', 'yesi@gmail.com', '1234', 'Empleado', 'Cocina', '20-11-2022', NULL),
-(5, 'Ale', 'Florentin', 'ale@gmail.com', '1234', 'Empleado', 'Cervecería', '22-02-2023', NULL),
-(6, 'Esteban', 'Pedrozo', 'esteban@gmail.com', '1234', 'Empleado', 'Mozo', '26-06-2022', NULL);
 --
 -- Índices para tablas volcadas
 --
@@ -231,6 +197,43 @@ ALTER TABLE `producto`
 ALTER TABLE `usuario`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 COMMIT;
+
+--
+-- Volcado de datos para la tabla `usuario`
+--
+
+INSERT INTO `usuario` (`nombre`, `apellido`, `email`, `clave`, `role`, `sector`, `fechaRegistro`, `fechaBaja`) VALUES
+('Salvador', 'Pedrozo', 'Salva.7693@gmail.com', '1234', 'Admin', NULL, '2022-02-26', NULL),
+('Esteban', 'Pedrozo', 'esteban@gmail.com', '1234', 'Empleado', 'Mozo', '2023-03-15', NULL),
+('Makarena', 'Jara', 'maka@gmail.com', '1234', 'Empleado', 'Barra', '2022-09-26', NULL),
+('Yesica', 'Contreras', 'yesi@gmail.com', '1234', 'Empleado', 'Cocina', '2022-11-20', NULL),
+('Ale', 'Florentin', 'ale@gmail.com', '1234', 'Empleado', 'Cervecería', '2023-02-22', NULL),
+('Esteban', 'Pedrozo', 'esteban@gmail.com', '1234', 'Empleado', 'Mozo', '2022-06-26', NULL);
+
+
+INSERT INTO `producto` (`nombre`, `sector`, `precio`, `stock`, `tiempoPreparacion`) VALUES
+('Pizza - Muzza', 'Cocina', 1000, 10, '00:30:00'),
+('Pizza - Especial', 'Cocina', 1200, 10, '00:30:00'),
+('Pizza - Peperoni', 'Cocina', 1500, 10, '00:30:00'),
+('Cerveza - Quilmes', 'Cervecería', 600, 80, '00:05:00'),
+('Cerveza - Brama', 'Cervecería', 600, 80, '00:05:00'),
+('Cerveza - Artesanal', 'Cervecería', 600, 80, '00:05:00'),
+('Vino Blanco', 'Barra', 900, 80, '00:05:00'),
+('Vino Tinto', 'Barra', 900, 80, '00:05:00'),
+('Flan', 'Cocina', 500, 80, '00:05:00');
+
+
+--
+-- Volcado de datos para la tabla `mesa`
+--
+
+INSERT INTO `mesa` (`estado`) VALUES
+('Cerrada'),
+('Cerrada'),
+('Cerrada'),
+('Cerrada'),
+('Cerrada'),
+('Cerrada');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

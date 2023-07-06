@@ -20,8 +20,8 @@ class UsuarioController extends Usuario implements IApiUsable
         $usr->nombre = $nombre;
         $usr->apellido = $apellido;
         $usr->email = $email;
-        $usr->role = getRole($role);
-        $usr->sector = getSector($sector);
+        $usr->role_ = $this->getRole($role);
+        $usr->sector = $this->getSector($sector);
         $usr->clave = password_hash($clave, PASSWORD_DEFAULT);
         $usr->guardar();
 
@@ -59,7 +59,7 @@ class UsuarioController extends Usuario implements IApiUsable
         $parametros = $request->getParsedBody();
 
         $nombre = $parametros['nombre'];
-        Usuario::modificarUsuario($nombre);
+        //Usuario::modificarUsuario($nombre);
 
         $payload = json_encode(array("mensaje" => "Usuario modificado con exito"));
 
@@ -82,11 +82,11 @@ class UsuarioController extends Usuario implements IApiUsable
           ->withHeader('Content-Type', 'application/json');
     }
 
-    private function getRole($role){
+    function getRole($role){
       return strcasecmp(ROLL_ADMIN, $role) ? ROLL_ADMIN : ROLL_EMPLEADO;
     }
 
-    private function getSector($sector){
+    public function getSector($sector){
       if(strcasecmp(SECTOR_COCINA, $sector)){
         return SECTOR_COCINA;
       } else if(strcasecmp(SECTOR_CERVECERIA, $sector)){
