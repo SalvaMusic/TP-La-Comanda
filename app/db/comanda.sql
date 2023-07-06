@@ -72,11 +72,13 @@ CREATE TABLE `mesa` (
 CREATE TABLE `pedido` (
   `id` int(11) NOT NULL,
   `usuarioId` int(11) NOT NULL,
+  `cliente` varchar(50) NOT NULL,
   `estado` varchar(50) NOT NULL,
   `codPedido` varchar(5) NOT NULL,
   `mesaId` int(11) NOT NULL,
-  `inicio` date NOT NULL,
-  `fin` date DEFAULT NULL,
+  `fecha` date NOT NULL,
+  `horaInicio` time DEFAULT NULL,
+  `horaFin` time DEFAULT NULL,
   `foto` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
