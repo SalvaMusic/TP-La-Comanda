@@ -5,6 +5,11 @@ class Mesa
     public $id;
     public $estado;
 
+    const ESTADO_CLI_ESPERANDO = 'Con cliente esperando pedido';
+    const ESTADO_CLI_COMIENDO = 'Con cliente comiendo';
+    const ESTADO_CLI_PAGANDO = 'Con cliente pagando';
+    const ESTADO_CERRADA = 'Cerrada';
+
     public function crearMesa()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();

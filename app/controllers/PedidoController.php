@@ -9,7 +9,7 @@ class PedidoController extends Pedido implements IApiUsable
 {
     public function CargarUno($request, $response, $args)
     {
-
+        $listaErrores = array();
         $data = $request->getParsedBody();
 
         // Acceder a las variables recibidas por POST
@@ -35,16 +35,8 @@ class PedidoController extends Pedido implements IApiUsable
         $fechaObj = DateTime::createFromFormat("d/m/Y", $fecha);
         $p->fecha = $fechaObj !== false ? $fechaObj->format("Y-m-d") : date("Y-m-d");
 
-        $mesaId = intval($mesaId);
-        $mesa = Mesa::obtener($mesaId);
-        if($mesa != null){
-            $p->mesaId = $mesaId;
-            $p->id = $p->guardar();
-            $mensaje = "Pedido realizado correctamente. En estado: " . $p->estado;
-        } else {
-            $mensaje = "Mesa Cerrada.";
-        }
-        
+        $this->setMesaId($p, $mesaId, $listaErrores);
+
         foreach ($detallePedidosData as $detalleData) {
             $detalle = new DetallePedido();
             $productoId = intval($detalleData['productoId']);
@@ -56,12 +48,29 @@ class PedidoController extends Pedido implements IApiUsable
             $detalle->crearDetallePedido();
         }
         
+        if (empty($listaErrores)) {
+            $p->id = $p->guardar();
+            $mensaje = "Pedido realizado correctamente. En estado: " . $p->estado;
+            $payload = json_encode(array("mensaje" => $mensaje));
+        } else {
+            $payload = json_encode(array("Errores" => $listaErrores));
+        }
 
-        $payload = json_encode(array("mensaje" => $mensaje));
 
         return $response->withJson($payload);
     }
-
+    
+    private function setMesaId(&$pedido, &$mesaId, &$listaErrores){
+        $mesaId = intval($mesaId);
+        $mesa = Mesa::obtener($mesaId);
+        if($mesa == null){
+            $listaErrores [] = "Mesa Inexistente";
+        } else if ($mesa->estado !== Mesa::ESTADO_CERRADA){
+            $listaErrores [] = "Mesa " . $mesa->estado;
+        } else {
+            $p->mesaId = $mesaId;
+        }
+    }
     public function TraerUno($request, $response, $args)
     {
        /* $id = $args['id'];
@@ -76,8 +85,8 @@ class PedidoController extends Pedido implements IApiUsable
 
     public function TraerTodos($request, $response, $args)
     {
-        $lista = Venta::obtenerTodos();
-        $payload = json_encode(array("lista Armas" => $lista));
+        $lista = Pedido::obtenerTodos();
+        $payload = json_encode(array("lista Pedidos" => $lista));
 
         $response->getBody()->write($payload);
         return $response
@@ -101,7 +110,6 @@ class PedidoController extends Pedido implements IApiUsable
         $parametros = $request->getParsedBody();
 
         $nombre = $parametros['nombre'];
-        //Usuario::modificarUsuario($nombre);
 
         $payload = json_encode(array("mensaje" => "Usuario modificado con exito"));
 
