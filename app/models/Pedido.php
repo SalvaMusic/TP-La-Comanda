@@ -14,6 +14,10 @@ class Pedido
     public $horaFin;
     public $foto;
 
+    const ESTADO_PENDIENTE = 'Pendiente';
+    const ESTADO_EN_PREPARACION = 'En Preparación';
+    const ESTADO_LISTO_PARA_SERVIR = 'Listo Para Servir';
+
     public function crearPedido()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
@@ -67,5 +71,26 @@ class Pedido
         $consulta->bindValue(':estado', $estado, PDO::PARAM_STR);
         $consulta->bindValue(':codPedido', $codPedido, PDO::PARAM_STR);
         $consulta->execute();
+    }
+
+    public function generarCodigoPedido()
+    {
+        
+        do {
+            $codigo = $this->generarCodigoAleatorio();
+        } while ($this->existeCodigoPedido($codigo));
+
+        $this->codigo;
+    }
+
+    private function generarCodigoAleatorio()
+    {
+        $codigo = substr(uniqid(), 0, 5);
+        return strtoupper($codigo);
+    }
+
+    private function existeCodigoPedido($codigo)
+    {        
+        return (Pedido::obtenerPedido($codigo) != null);
     }
 }

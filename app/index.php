@@ -34,24 +34,13 @@ $app->addBodyParsingMiddleware();
 
 // Routes
 $app->group('/usuarios', function (RouteCollectorProxy $group) {
-    $group->get('[/]', \UsuarioController::class . ':TraerTodos');
-    $group->get('/{usuario}', \UsuarioController::class . ':TraerUno');
-    $group->post('[/]', \UsuarioController::class . ':CargarUno');
+  $group->post('[/]', \UsuarioController::class . ':login');
+  $group->get('/arma/{nombreArma}', \UsuarioController::class . ':TraerUno')->add(new AutenticacionMiddleware("Admin"));
+
 });
 
-$app->group('/credenciales', function (RouteCollectorProxy $group) {
-  $group->map(['GET', 'POST'], '', function($request, $response, array $args){
-    $method = $request->getMethod();
-    $response->getBody()->write($method);
-    return $response;
-  });
-});
-
-$app->get('[/]', function (Request $request, Response $response) {    
-    $payload = json_encode(array("mensaje" => "Slim Framework 4 ssPHP"));
-    
-    $response->getBody()->write($payload);
-    return $response->withHeader('Content-Type', 'application/json');
+$app->group('/pedido', function (RouteCollectorProxy $group) {
+  $group->post('/cargar', \PedidoController::class . ':CargarUno');
 });
 
 $app->run();

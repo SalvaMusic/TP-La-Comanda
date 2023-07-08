@@ -1,6 +1,7 @@
 <?php
 require_once './models/Usuario.php';
 require_once './interfaces/IApiUsable.php';
+require_once 'JWTController.php';
 
 class UsuarioController extends Usuario implements IApiUsable
 {
@@ -32,16 +33,34 @@ class UsuarioController extends Usuario implements IApiUsable
           ->withHeader('Content-Type', 'application/json');
     }
 
+    public static function login($request, $response, array $args)
+    {
+        $parametros = $request->getParsedBody();
+
+        $email = $parametros['email'];
+        $clave = $parametros['clave'];
+
+        $usr = Usuario::obtenerUsuarioPorEmail($email);
+
+        if ($usr != null) {
+            if (password_verify($clave, $usr->clave)) {
+                $token = JWTController::crearToken($usr->id, $email, $usr->tipo);
+                $mensaje = "Usuario " . $email ." Logeado correctamente.  Sector: " . $usr->tipo;
+                $retorno = json_encode(array("mensaje" => $mensaje));
+                $response = $response->withHeader('Authorization', $token);
+            } else {
+                $retorno = json_encode(array("mensaje" => "Contraseña incorrecta"));
+            }
+        } else {
+            $retorno = json_encode(array("mensaje" => "Usuario no encontrado"));
+        }
+        $response->getBody()->write($retorno);
+        return $response;
+    }
+    
     public function TraerUno($request, $response, $args)
     {
-        // Buscamos usuario por nombre
-        $usr = $args['usuario'];
-        $usuario = Usuario::obtenerUsuario($usr);
-        $payload = json_encode($usuario);
-
-        $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'application/json');
+       
     }
 
     public function TraerTodos($request, $response, $args)
@@ -56,16 +75,7 @@ class UsuarioController extends Usuario implements IApiUsable
     
     public function ModificarUno($request, $response, $args)
     {
-        $parametros = $request->getParsedBody();
-
-        $nombre = $parametros['nombre'];
-        //Usuario::modificarUsuario($nombre);
-
-        $payload = json_encode(array("mensaje" => "Usuario modificado con exito"));
-
-        $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'application/json');
+        
     }
 
     public function BorrarUno($request, $response, $args)
