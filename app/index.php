@@ -18,6 +18,7 @@ require_once './db/AccesoDatos.php';
 // require_once './middlewares/Logger.php';
 
 require_once './controllers/UsuarioController.php';
+require_once './controllers/PedidoController.php';
 
 // Load ENV
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
@@ -35,7 +36,9 @@ $app->addBodyParsingMiddleware();
 // Routes
 $app->group('/usuarios', function (RouteCollectorProxy $group) {
   $group->post('[/]', \UsuarioController::class . ':login');
-  $group->get('/arma/{nombreArma}', \UsuarioController::class . ':TraerUno')->add(new AutenticacionMiddleware("Admin"));
+  $group->get('/arma/{nombreArma}', \UsuarioController::class . ':TraerUno')
+    //->add(new AutenticacionMiddleware("Admin"))
+  ;
 
 });
 
