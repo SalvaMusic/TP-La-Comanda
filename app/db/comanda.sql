@@ -29,11 +29,10 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `detalle_pedido` (
   `id` int(11) NOT NULL,
-  `pedidoId` int(11) NOT NULL,
+  `codPedido` varchar(5) NOT NULL,
   `productoId` int(11) NOT NULL,
   `cantidad` int(11) NOT NULL,
-  `estado` varchar(50) NOT NULL,
-  `sector` varchar(50) NOT NULL
+  `estado` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------

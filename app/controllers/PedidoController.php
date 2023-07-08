@@ -19,6 +19,7 @@ class PedidoController extends Pedido implements IApiUsable
         $horaInicio = isset($data['horaInicio']) ? $data['horaInicio'] : date('H:i:s');        
         $usuarioId = $data['usuarioId'];
         $cantidad = $data['cantidad'];
+        $mesaId = $data['mesaId'];
 
         $p = new Pedido();
         $p->cliente = $cliente;
@@ -34,35 +35,31 @@ class PedidoController extends Pedido implements IApiUsable
         $fechaObj = DateTime::createFromFormat("d/m/Y", $fecha);
         $p->fecha = $fechaObj !== false ? $fechaObj->format("Y-m-d") : date("Y-m-d");
 
+        $mesaId = intval($mesaId);
+        $mesa = Mesa::obtener($mesaId);
+        if($mesa != null){
+            $p->mesaId = $mesaId;
+            $p->id = $p->guardar();
+            $mensaje = "Pedido realizado correctamente. En estado: " . $p->estado;
+        } else {
+            $mensaje = "Mesa Cerrada.";
+        }
         
-            $mesaId = intval($mesaId);
-            $mesa = Mesa::obtener($mesaId);
-            if($mesa != null){
-                $p->mesaId = $mesaId;
-                $p->guardar();
-                $mensaje = "Pedido realizado correctamente. En estado: " . $p->estado;
-            } else {
-                $mensaje = "Mesa Cerrada.";
-            }
+        foreach ($detallePedidosData as $detalleData) {
+            $detalle = new DetallePedido();
+            $productoId = intval($detalleData['productoId']);
+            $cantidad = intval($detalleData['cantidad']);
+            $detalle->productoId = Producto::obtenerProducto($productoId) != null ? $productoId : null;
+            $detalle->cantidad = $cantidad;
+            $detalle->codPedido = $p->codPedido;
+            $detalle->estado = Pedido::ESTADO_PENDIENTE;
+            $detalle->crearDetallePedido();
+        }
         
-            $detallePedidos = array();
-            foreach ($detallePedidosData as $detalleData) {
-                $detalle = new DetallePedido();
-                $productoId = intval($detalleData['productoId']);
-                $cantidad = intval($detalleData['cantidad']);
-                $detalle->productoId = Producto::obtenerProducto($productoId) != null ? $productoId : null;
-                $detalle->cantidad = $cantidad;
-                $detalle->estado = Pedido::ESTADO_PENDIENTE;
-        
-                $detallePedidos[] = $detalle;
-            }
-        
-            // Asignar el array de detalles de pedido a $p->detallePedidos
-            $p->detallePedidos = $detallePedidos;
 
         $payload = json_encode(array("mensaje" => $mensaje));
 
-        return $$response->withJson($payload);
+        return $response->withJson($payload);
     }
 
     public function TraerUno($request, $response, $args)
