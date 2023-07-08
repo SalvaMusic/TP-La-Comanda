@@ -4,23 +4,30 @@ class Pedido
 {
     public $id;
     public $usuarioId;
+    public $cliente;
     public $estado;
     public $codPedido;
-    public $mesa;
+    public $mesaId;
     public $detallePedidos;
-    public $fechaInicio;
-    public $fechaFin;
+    public $fecha;
+    public $horaInicio;
+    public $horaFin;
     public $foto;
 
     public function crearPedido()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO pedido (usuarioId, estado, codPedido, mesaId, fechaInicio, foto) VALUES (:usuarioId, :estado, :codPedido, :mesaId, :fechaInicio, :foto)");
-        $consulta->bindValue(':usuarioId', $this->usuarioId, PDO::PARAM_STR);
+        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO pedido 
+            (usuarioId, cliente, estado, codPedido, mesaId, fecha, horaInicio, horaFin, foto) VALUES
+            (:usuarioId, :cliente, :estado, :codPedido, :mesaId, :fecha, :horaInicio, :horaFin, :foto)");
+        $consulta->bindValue(':usuarioId', $this->usuarioId, PDO::PARAM_INT);
+        $consulta->bindValue(':cliente', $this->usuarioId, PDO::PARAM_STR);
         $consulta->bindValue(':estado', $this->estado, PDO::PARAM_STR);
         $consulta->bindValue(':codPedido', $this->codPedido, PDO::PARAM_STR);
-        $consulta->bindValue(':mesaId', $this->mesa, PDO::PARAM_STR);
-        $consulta->bindValue(':fechaInicio', $this->fechaInicio, PDO::PARAM_INT);
+        $consulta->bindValue(':mesaId', $this->mesaId, PDO::PARAM_INT);
+        $consulta->bindValue(':fecha', $this->fecha,);
+        $consulta->bindValue(':horaInicio', $this->horaInicio, PDO::PARAM_STR);
+        $consulta->bindValue(':horaFin', $this->horaFin, PDO::PARAM_STR);
         $consulta->bindValue(':foto', $this->foto, PDO::PARAM_STR);
         $consulta->execute();
 
