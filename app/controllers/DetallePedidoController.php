@@ -38,8 +38,8 @@ class DetallePedidoController extends DetallePedido implements IApiUsable
 
     public function TraerPendientes($request, $response, $args)
     {
-        $sector = isset($args['sector']) ? $args['sector'] : null;
-        $pedido = isset($args['pedido']) ? $args['pedido'] : null;
+        $sector = isset($args['sector']) ? $args['sector'] : 'TODOS';
+        $pedido = isset($args['pedido']) ? $args['pedido'] : 'TODOS';
         $lista = DetallePedido::obtenerPendientes($pedido, $sector);
         $payload = json_encode(array("lista Pedidos" => $lista));
 

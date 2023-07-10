@@ -45,10 +45,10 @@ class DetallePedido
         $query = "SELECT dp.* FROM detalle_pedido as dp
             JOIN pedido as p ON dp.codPedido = p.codPedido 
             JOIN producto as prod ON prod.id = dp.productoId
-            WHERE (:codPedido IS NULL OR p.codPedido = :codPedido)
-            AND (:sector IS NULL OR prod.sector = :sector)
+            WHERE (:codPedido = 'TODOS' OR p.codPedido = :codPedido)
+            AND (:sector = 'TODOS' OR prod.sector = :sector)
             AND p.estado = :estado
-            ORDER BY p.horaInicio desc ";
+        ORDER BY p.horaInicio DESC";
         $consulta = $objAccesoDatos->prepararConsulta($query);
         $consulta->bindValue(':codPedido', $codPedido);
         $consulta->bindValue(':sector', $sector);
