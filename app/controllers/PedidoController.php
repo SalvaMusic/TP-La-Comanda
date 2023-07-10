@@ -1,9 +1,9 @@
 <?php
 require_once './models/Pedido.php';
 require_once './models/Producto.php';
+require_once './models/Mesa.php';
+require_once './models/DetallePedido.php';
 require_once './interfaces/IApiUsable.php';
-
-use DateTime;
 
 class PedidoController extends Pedido implements IApiUsable
 {
@@ -18,8 +18,7 @@ class PedidoController extends Pedido implements IApiUsable
         $fecha = isset($data['fecha']) ? $data['fecha'] : date('d/m/Y');
         $horaInicio = isset($data['horaInicio']) ? $data['horaInicio'] : date('H:i:s');        
         $usuarioId = $data['usuarioId'];
-        $cantidad = $data['cantidad'];
-        $mesaId = $data['mesaId'];
+        $mesaId = $data['mesa'];
 
         $p = new Pedido();
         $p->cliente = $cliente;
@@ -28,8 +27,7 @@ class PedidoController extends Pedido implements IApiUsable
         $p->horaInicio = $horaInicio;
 
         $p->usuarioId = intval($usuarioId);
-        $p->cantidad = intval($cantidad);
-        
+
         $mensaje = null;
 
         $fechaObj = DateTime::createFromFormat("d/m/Y", $fecha);
@@ -49,15 +47,17 @@ class PedidoController extends Pedido implements IApiUsable
         }
         
         if (empty($listaErrores)) {
-            $p->id = $p->guardar();
-            $mensaje = "Pedido realizado correctamente. En estado: " . $p->estado;
+            $p->id = $p->crearPedido();
+            $mensaje = "Pedido realizado correctamente.\n Pedido: " . $p->codPedido . " En estado: " . $p->estado;
             $payload = json_encode(array("mensaje" => $mensaje));
         } else {
             $payload = json_encode(array("Errores" => $listaErrores));
         }
 
 
-        return $response->withJson($payload);
+        $response->getBody()->write($payload);
+        return $response
+          ->withHeader('Content-Type', 'application/json');
     }
     
     private function setMesaId(&$pedido, &$mesaId, &$listaErrores){
@@ -68,7 +68,7 @@ class PedidoController extends Pedido implements IApiUsable
         } else if ($mesa->estado !== Mesa::ESTADO_CERRADA){
             $listaErrores [] = "Mesa " . $mesa->estado;
         } else {
-            $p->mesaId = $mesaId;
+            $pedido->mesaId = $mesaId;
         }
     }
     public function TraerUno($request, $response, $args)

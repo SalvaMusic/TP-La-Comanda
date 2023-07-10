@@ -15,10 +15,10 @@ use Slim\Routing\RouteContext;
 require __DIR__ . '/../vendor/autoload.php';
 
 require_once './db/AccesoDatos.php';
-// require_once './middlewares/Logger.php';
 
 require_once './controllers/UsuarioController.php';
 require_once './controllers/PedidoController.php';
+require_once './controllers/DetallePedidoController.php';
 
 // Load ENV
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
@@ -44,6 +44,7 @@ $app->group('/usuarios', function (RouteCollectorProxy $group) {
 
 $app->group('/pedido', function (RouteCollectorProxy $group) {
   $group->post('/cargar', \PedidoController::class . ':CargarUno');
+  $group->get('/traerPendientes', \DetallePedidoController::class . ':TraerPendientes');
 });
 
 $app->run();

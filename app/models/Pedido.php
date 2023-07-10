@@ -74,18 +74,17 @@ class Pedido
     }
 
     public function generarCodigoPedido()
-    {
-        
+    {        
         do {
             $codigo = $this->generarCodigoAleatorio();
         } while ($this->existeCodigoPedido($codigo));
 
-        $this->codigo;
+        $this->codPedido = $codigo;
     }
 
     private function generarCodigoAleatorio()
     {
-        $codigo = substr(uniqid(), 0, 5);
+        $codigo = substr(uniqid(), -5);
         return strtoupper($codigo);
     }
 

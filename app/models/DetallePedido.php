@@ -39,19 +39,24 @@ class DetallePedido
         return $consulta->fetchAll(PDO::FETCH_CLASS, 'DetallePedido');
     }
 
-    public static function obtenerDetallePedido($codPedido, $sector)
+    public static function obtenerPendientes($codPedido, $sector)
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $query = "SELECT dp.* FROM detalle_pedido as dp
+            JOIN pedido as p ON dp.codPedido = p.codPedido 
             JOIN producto as prod ON prod.id = dp.productoId
-            WHERE codPedido = :codPedido
-            AND prod.sector = :sector";
+            WHERE (:codPedido IS NULL OR p.codPedido = :codPedido)
+            AND (:sector IS NULL OR prod.sector = :sector)
+            AND p.estado = :estado
+            ORDER BY p.horaInicio desc ";
         $consulta = $objAccesoDatos->prepararConsulta($query);
-        $consulta->bindValue(':codPedido', $codPedido, PDO::PARAM_INT);
-        $consulta->bindValue(':sector', $sector, PDO::PARAM_STR);
+        $consulta->bindValue(':codPedido', $codPedido);
+        $consulta->bindValue(':sector', $sector);
+        $consulta->bindValue(':estado', Pedido::ESTADO_PENDIENTE, PDO::PARAM_STR);
         $consulta->execute();
 
-        return $consulta->fetchObject('DetallePedido');
+        return $consulta->fetchAll(PDO::FETCH_CLASS, 'DetallePedido');
+
     }
 
 }
