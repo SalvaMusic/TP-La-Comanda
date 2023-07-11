@@ -7,17 +7,15 @@ class Producto
     public $sector;
     public $precio;
     public $stock;
-    public $tiempoDePreparacion;
 
     public function guardar()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO producto (nombre, sector, precio, stock, tiempoDePreparacion) VALUES (:nombre, :sector, :precio, :stock, :tiempoDePreparacion)");
+        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO producto (nombre, sector, precio, stock) VALUES (:nombre, :sector, :precio, :stock)");
         $consulta->bindValue(':nombre', $this->nombre, PDO::PARAM_STR);
         $consulta->bindValue(':sector', $this->sector, PDO::PARAM_STR);
         $consulta->bindValue(':precio', $this->precio);
         $consulta->bindValue(':stock', $this->stock, PDO::PARAM_INT);
-        $consulta->bindValue(':tiempoDePreparacion', $this->tiempoDePreparacion, PDO::PARAM_INT);
         $consulta->execute();
 
         return $objAccesoDatos->obtenerUltimoId();
@@ -26,7 +24,7 @@ class Producto
     public static function obtenerTodos()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, nombre, sector, precio, stock, tiempoDePreparacion FROM producto");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT * FROM producto");
         $consulta->execute();
 
         return $consulta->fetchAll(PDO::FETCH_CLASS, 'Producto');

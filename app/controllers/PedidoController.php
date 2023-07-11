@@ -16,7 +16,7 @@ class PedidoController extends Pedido implements IApiUsable
         $cliente = $data['cliente'];
         $detallePedidosData = isset($data['detallePedidos']) ? $data['detallePedidos'] : array();
         $fecha = isset($data['fecha']) ? $data['fecha'] : date('d/m/Y');
-        $horaInicio = isset($data['horaInicio']) ? $data['horaInicio'] : date('H:i:s');        
+        $horaOrden = isset($data['horaInicio']) ? $data['horaInicio'] : date('H:i:s');        
         $usuarioId = $data['usuarioId'];
         $mesaId = $data['mesa'];
 
@@ -24,7 +24,7 @@ class PedidoController extends Pedido implements IApiUsable
         $p->cliente = $cliente;
         $p->estado = Pedido::ESTADO_PENDIENTE;
         $p->generarCodigoPedido();
-        $p->horaInicio = $horaInicio;
+        $p->horaOrden = $horaOrden;
 
         $p->usuarioId = intval($usuarioId);
 
@@ -34,21 +34,21 @@ class PedidoController extends Pedido implements IApiUsable
         $p->fecha = $fechaObj !== false ? $fechaObj->format("Y-m-d") : date("Y-m-d");
 
         $this->setMesaId($p, $mesaId, $listaErrores);
-
-        foreach ($detallePedidosData as $detalleData) {
-            $detalle = new DetallePedido();
-            $productoId = intval($detalleData['productoId']);
-            $cantidad = intval($detalleData['cantidad']);
-            $detalle->productoId = Producto::obtenerProducto($productoId) != null ? $productoId : null;
-            $detalle->cantidad = $cantidad;
-            $detalle->codPedido = $p->codPedido;
-            $detalle->estado = Pedido::ESTADO_PENDIENTE;
-            $detalle->crearDetallePedido();
+        if (empty($listaErrores)) {
+            $p->id = $p->crearPedido();
+            foreach ($detallePedidosData as $detalleData) {
+                $detalle = new DetallePedido();
+                $this->setProductoId($detalle, $detalleData['productoId'], $listaErrores);
+                $cantidad = intval($detalleData['cantidad']);
+                $detalle->cantidad = $cantidad;
+                $detalle->pedidoId = $p->id;
+                $detalle->estado = Pedido::ESTADO_PENDIENTE;
+                $detalle->guardar();
+            }
         }
         
         if (empty($listaErrores)) {
-            $p->id = $p->crearPedido();
-            $mensaje = "Pedido realizado correctamente.\n Pedido: " . $p->codPedido . " En estado: " . $p->estado;
+            $mensaje = "Pedido realizado correctamente. Código: " . $p->codPedido . " En estado: " . $p->estado;
             $payload = json_encode(array("mensaje" => $mensaje));
         } else {
             $payload = json_encode(array("Errores" => $listaErrores));
@@ -69,18 +69,31 @@ class PedidoController extends Pedido implements IApiUsable
             $listaErrores [] = "Mesa " . $mesa->estado;
         } else {
             $pedido->mesaId = $mesaId;
+            $mesa->estado = Mesa::ESTADO_CLI_ESPERANDO;
+            $mesa->guardarEstado();
         }
     }
-    public function TraerUno($request, $response, $args)
+
+    private function setProductoId(&$detallePedido, &$productoId, &$listaErrores){
+        $productoId = intval($productoId);
+        $producto = Producto::obtenerProducto($productoId);
+        if($producto == null){
+            $listaErrores [] = "Producto Inexistente";
+        } else {
+            $detallePedido->productoId = $productoId;
+        }
+    }
+
+    public function tiempoRestante($request, $response, $args)
     {
-       /* $id = $args['id'];
-        $arma = Venta::obtener($id);
-        $data = $arma ? $arma : "Arma Inexistente";
-        $payload = json_encode($data);
+        $codPedido = $args['codPedido'];
+        $pedido = Pedido::obtener($codPedido);
+
+        $tiempoRestante = $pedido->obtenerTiempoRestante();
+        $payload = json_encode("Tiempo Restante: " . $tiempoRestante);
 
         $response->getBody()->write($payload);
-        return $response
-            ->withHeader('Content-Type', 'application/json');*/
+        return $response->withHeader('Content-Type', 'application/json');
     }
 
     public function TraerTodos($request, $response, $args)

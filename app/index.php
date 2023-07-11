@@ -19,6 +19,7 @@ require_once './db/AccesoDatos.php';
 require_once './controllers/UsuarioController.php';
 require_once './controllers/PedidoController.php';
 require_once './controllers/DetallePedidoController.php';
+require_once './controllers/MesaController.php';
 
 // Load ENV
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
@@ -44,7 +45,16 @@ $app->group('/usuarios', function (RouteCollectorProxy $group) {
 
 $app->group('/pedido', function (RouteCollectorProxy $group) {
   $group->post('/cargar', \PedidoController::class . ':CargarUno');
+  $group->get('/tiempoRestante/{codPedido}', \PedidoController::class . ':TiempoRestante');
+  $group->get('/traerTodos', \DetallePedidoController::class . ':TraerTodos');
   $group->get('/traerPendientes', \DetallePedidoController::class . ':TraerPendientes');
+  $group->put('/prepararPedido', \DetallePedidoController::class . ':PrepararPedido');
+  $group->put('/finalizarPedido', \DetallePedidoController::class . ':FinalizarPedido');
+});
+
+$app->group('/mesa', function (RouteCollectorProxy $group) {
+  $group->put('/cambiarEstado/{id}', \MesaController::class . ':CambiarEstado');
+  $group->put('/cerrar/{id}', \MesaController::class . ':CerrarMesa');
 });
 
 $app->run();

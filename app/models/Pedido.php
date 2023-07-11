@@ -12,6 +12,7 @@ class Pedido
     public $fecha;
     public $horaInicio;
     public $horaFin;
+    public $horaOrden;    
     public $foto;
 
     const ESTADO_PENDIENTE = 'Pendiente';
@@ -22,8 +23,8 @@ class Pedido
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO pedido 
-            (usuarioId, cliente, estado, codPedido, mesaId, fecha, horaInicio, horaFin, foto) VALUES
-            (:usuarioId, :cliente, :estado, :codPedido, :mesaId, :fecha, :horaInicio, :horaFin, :foto)");
+            (usuarioId, cliente, estado, codPedido, mesaId, fecha, horaInicio, horaFin, horaOrden, foto) VALUES
+            (:usuarioId, :cliente, :estado, :codPedido, :mesaId, :fecha, :horaInicio, :horaFin, :horaOrden, :foto)");
         $consulta->bindValue(':usuarioId', $this->usuarioId, PDO::PARAM_INT);
         $consulta->bindValue(':cliente', $this->usuarioId, PDO::PARAM_STR);
         $consulta->bindValue(':estado', $this->estado, PDO::PARAM_STR);
@@ -32,6 +33,7 @@ class Pedido
         $consulta->bindValue(':fecha', $this->fecha,);
         $consulta->bindValue(':horaInicio', $this->horaInicio, PDO::PARAM_STR);
         $consulta->bindValue(':horaFin', $this->horaFin, PDO::PARAM_STR);
+        $consulta->bindValue(':horaOrden', $this->horaOrden, PDO::PARAM_STR);
         $consulta->bindValue(':foto', $this->foto, PDO::PARAM_STR);
         $consulta->execute();
 
@@ -47,6 +49,41 @@ class Pedido
         return $consulta->fetchAll(PDO::FETCH_CLASS, 'Pedido');
     }
 
+    public function obtenerTiempoRestante()
+    {
+        $tiempoRestantePedido = 0;
+        foreach ($this->detallePedidos as $detallePedido) {
+            if ($detallePedido->estado == DetallePedido::ESTADO_EN_PREPARACION) {
+                $horaInicio = strtotime($detallePedido->horaInicio);
+                $tiempoEstimado = strtotime($detallePedido->tiempoEstimado);
+
+                $tiempoRestante = $horaInicio + $tiempoEstimado - time();
+                if ($tiempoRestante > $tiempoRestantePedido) {
+                    $tiempoRestantePedido = $tiempoRestante;
+                }
+            }
+        }
+        return $tiempoRestantePedido;
+    }
+
+    public static function obtenerTodosDetalles()
+    {
+        $pedidos = Pedido::obtenerTodos();
+        $detallePedidos = DetallePedido::obtenerTodos();
+
+        foreach ($pedidos as $pedido) {
+            $pedido->detallePedidos = []; // Inicializar el array detallePedidos para cada Pedido
+        
+            foreach ($detallePedidos as $detallePedido) {
+                if ($detallePedido->pedidoId == $pedido->id) {
+                    $pedido->detallePedidos[] = $detallePedido; // Agregar el DetallePedido al array detallePedidos del Pedido actual
+                }
+            }
+        }
+
+        return $pedidos;
+    }
+
     public static function obtenerPedido($codPedido)
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
@@ -56,6 +93,72 @@ class Pedido
 
         return $consulta->fetchObject('Pedido');
     }
+
+    public static function obtenerPorDeralleId($detalleId)
+    {
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();            
+        $consulta = $objAccesoDatos->prepararConsulta(
+            "SELECT p.* FROM detalle_pedido as dp 
+            JOIN pedido p ON dp.pedidoId = p.id
+            WHERE dp.id = :detalleId");
+        $consulta->bindValue(':detalleId', $detalleId);
+        $consulta->execute();
+
+        return $consulta->fetchObject('Pedido');
+    }
+
+    public static function obtenerDetalleEnPreparacion($id)
+    {
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();            
+        $consulta = $objAccesoDatos->prepararConsulta(
+            "SELECT dp.* FROM detalle_pedido as dp 
+            JOIN pedido p ON dp.pedidoId = p.id
+            WHERE dp.estado = :estado
+            AND p.id = :id");
+        $consulta->bindValue(':id', $id);
+        $consulta->bindValue(':estado', Pedido::ESTADO_EN_PREPARACION);
+        $consulta->execute();
+
+        return $consulta->fetchAll(PDO::FETCH_CLASS, 'DetallePedido');
+    }
+
+    public static function obtenerPendientes($codPedido)
+    {
+        $todosPedidos = $codPedido == null ? 'TODOS' : null;
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $query = "SELECT p.* FROM pedido as p
+            WHERE (:todosPedidos = 'TODOS' OR p.codPedido = :codPedido)
+            AND p.estado = :estado
+            ORDER BY p.horaInicio DESC";
+            
+        $consulta = $objAccesoDatos->prepararConsulta($query);
+        $consulta->bindValue(':codPedido', $codPedido);
+        $consulta->bindValue(':todosPedidos', $todosPedidos);
+        $consulta->bindValue(':estado', Pedido::ESTADO_PENDIENTE, PDO::PARAM_STR);
+        $consulta->execute();
+
+        return $consulta->fetchAll(PDO::FETCH_CLASS, 'Pedido');
+
+    }
+
+    public static function obtenerPendientesDetalles($codPedido)
+    {
+        $pedidos = Pedido::obtenerPendientes($codPedido);
+        $detallePedidos = DetallePedido::obtenerPendientes($codPedido);
+
+        foreach ($pedidos as $pedido) {
+            $pedido->detallePedidos = []; // Inicializar el array detallePedidos para cada Pedido
+        
+            foreach ($detallePedidos as $detallePedido) {
+                if ($detallePedido->pedidoId == $pedido->id) {
+                    $pedido->detallePedidos[] = $detallePedido; // Agregar el DetallePedido al array detallePedidos del Pedido actual
+                }
+            }
+        }
+
+        return $pedidos;
+    }
+
 
     public static function guardarEstado($codPedido)
     {

@@ -64,6 +64,7 @@ CREATE TABLE `pedido` (
   `codPedido` varchar(5) NOT NULL,
   `mesaId` int(11) NOT NULL,
   `fecha` date NOT NULL,
+  `horaOrden` time,
   `horaInicio` time DEFAULT NULL,
   `horaFin` time DEFAULT NULL,
   `foto` varchar(255) DEFAULT NULL
@@ -77,10 +78,12 @@ CREATE TABLE `pedido` (
 
 CREATE TABLE `detalle_pedido` (
   `id` int(11) NOT NULL,
-  `codPedido` varchar(5) NOT NULL,
+  `pedidoId` int(11) NOT NULL,
   `productoId` int(11) NOT NULL,
   `cantidad` int(11) NOT NULL,
-  `estado` varchar(50) NOT NULL
+  `estado` varchar(50) NOT NULL,
+  `horaInicio` time,
+  `tiempoEstimado` time DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -94,8 +97,7 @@ CREATE TABLE `producto` (
   `nombre` varchar(100) NOT NULL,
   `sector` varchar(50) NOT NULL,
   `precio` float DEFAULT NULL,
-  `stock` int(11) NOT NULL,
-  `tiempoPreparacion` time DEFAULT NULL
+  `stock` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -214,16 +216,16 @@ INSERT INTO `usuario` (`id`, `nombre`, `apellido`, `email`, `clave`, `role`, `se
 (6, 'Esteban', 'Pedrozo', 'esteban@gmail.com', '1234', 'Empleado', 'Mozo', '2022-06-26', NULL);
 
 
-INSERT INTO `producto` (`id`, `nombre`, `sector`, `precio`, `stock`, `tiempoPreparacion`) VALUES
-(1, 'Pizza - Muzza', 'Cocina', 1000, 10, '00:30:00'),
-(2, 'Pizza - Especial', 'Cocina', 1200, 10, '00:30:00'),
-(3, 'Pizza - Peperoni', 'Cocina', 1500, 10, '00:30:00'),
-(4, 'Cerveza - Quilmes', 'Cervecería', 600, 80, '00:05:00'),
-(5, 'Cerveza - Brama', 'Cervecería', 600, 80, '00:05:00'),
-(6, 'Cerveza - Artesanal', 'Cervecería', 600, 80, '00:05:00'),
-(7, 'Vino Blanco', 'Barra', 900, 80, '00:05:00'),
-(8, 'Vino Tinto', 'Barra', 900, 80, '00:05:00'),
-(9, 'Flan', 'Cocina', 500, 80, '00:05:00');
+INSERT INTO `producto` (`id`, `nombre`, `sector`, `precio`, `stock`) VALUES
+(1, 'Pizza - Muzza', 'Cocina', 1000, 10),
+(2, 'Pizza - Especial', 'Cocina', 1200, 10),
+(3, 'Pizza - Peperoni', 'Cocina', 1500, 10),
+(4, 'Cerveza - Quilmes', 'Cervecería', 600, 80),
+(5, 'Cerveza - Brama', 'Cervecería', 600, 80),
+(6, 'Cerveza - Artesanal', 'Cervecería', 600, 80),
+(7, 'Vino Blanco', 'Barra', 900, 80),
+(8, 'Vino Tinto', 'Barra', 900, 80),
+(9, 'Flan', 'Cocina', 500, 80);
 
 
 --
