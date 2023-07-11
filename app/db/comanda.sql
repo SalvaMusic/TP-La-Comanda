@@ -208,7 +208,7 @@ COMMIT;
 --
 
 INSERT INTO `usuario` (`id`, `nombre`, `apellido`, `email`, `clave`, `role`, `sector`, `fechaRegistro`, `fechaBaja`) VALUES
-(1, 'Salvador', 'Pedrozo', 'Salva.7693@gmail.com', '1234', 'Admin', NULL, '2022-02-26', NULL),
+(1, 'Salvador', 'Pedrozo', 'salva.7693@gmail.com', '1234', 'Admin', NULL, '2022-02-26', NULL),
 (2, 'Esteban', 'Pedrozo', 'esteban@gmail.com', '1234', 'Empleado', 'Mozo', '2023-03-15', NULL),
 (3, 'Makarena', 'Jara', 'maka@gmail.com', '1234', 'Empleado', 'Barra', '2022-09-26', NULL),
 (4, 'Yesica', 'Contreras', 'yesi@gmail.com', '1234', 'Empleado', 'Cocina', '2022-11-20', NULL),
