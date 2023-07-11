@@ -11,6 +11,7 @@ class PedidoController extends Pedido implements IApiUsable
     {
         $listaErrores = array();
         $data = $request->getParsedBody();
+        date_default_timezone_set('America/Argentina/Buenos_Aires');
 
         // Acceder a las variables recibidas por POST
         $cliente = $data['cliente'];
@@ -35,7 +36,7 @@ class PedidoController extends Pedido implements IApiUsable
 
         $this->setMesaId($p, $mesaId, $listaErrores);
         if (empty($listaErrores)) {
-            $p->id = $p->crearPedido();
+            $p->id = $p->guardar();
             foreach ($detallePedidosData as $detalleData) {
                 $detalle = new DetallePedido();
                 $this->setProductoId($detalle, $detalleData['productoId'], $listaErrores);
@@ -87,10 +88,19 @@ class PedidoController extends Pedido implements IApiUsable
     public function tiempoRestante($request, $response, $args)
     {
         $codPedido = $args['codPedido'];
-        $pedido = Pedido::obtener($codPedido);
+        $pedido = Pedido::obtenerPedido($codPedido);
 
-        $tiempoRestante = $pedido->obtenerTiempoRestante();
-        $payload = json_encode("Tiempo Restante: " . $tiempoRestante);
+        if($pedido != null){
+            $tiempoRestante = $pedido->obtenerTiempoRestante();
+            if($tiempoRestante != null){
+                $mensaje = "Tiempo Restante: " . $tiempoRestante;
+            } else {
+                $mensaje = "Pedido próximo a preparar";
+            }
+            $payload = json_encode($mensaje);
+        } else {
+            $payload = json_encode("Pedido " . $codPedido . " Inexistente.");
+        }
 
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');

@@ -23,9 +23,9 @@ class DetallePedidoController extends DetallePedido implements IApiUsable
 
     public function TraerPendientes($request, $response, $args)
     {
-        $pedido = isset($args['pedido']) ? $args['pedido'] : null;
+        $pedido = $args['codPedido'] == 'TODOS' ? null : $args['codPedido'];
         $lista = Pedido::obtenerPendientesDetalles($pedido);
-        $payload = json_encode(array("lista Pedidos" => $lista));
+        $payload = json_encode(array("lista Pendientes" => $lista));
 
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
@@ -36,13 +36,18 @@ class DetallePedidoController extends DetallePedido implements IApiUsable
         $data = $request->getParsedBody();
         $id = $args['detallePedidoId'];
         $duracion = $data['duracion'];
+        $detalle = DetallePedido::obtener($id);
 
-        $this->ModificarPedido($id, $duracion, Pedido::ESTADO_EN_PREPARACION);
+        if($detalle != null){
+          $this->ModificarPedido($detalle, $duracion, Pedido::ESTADO_EN_PREPARACION);
+          $mensaje = array(
+            "mensaje" => "Pedido tomado con exito",
+            "Detalle" => $detalle);
+        } else {
+          $mensaje = "Detalle Pedido " . $id . " Inexistente";
+        }
 
-        $retorno = array(
-          "mensaje" => "Pedido tomado con exito",
-          "Detalle" => $detalle);
-        $payload = json_encode($retorno);
+        $payload = json_encode($mensaje);
 
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
@@ -52,40 +57,49 @@ class DetallePedidoController extends DetallePedido implements IApiUsable
     {
         $data = $request->getParsedBody();
         $id = $args['detallePedidoId'];
-        $duracion = $data['duracion'];
+        $detalle = DetallePedido::obtener($id);
+echo "DetallePedido::obtener()";
+        if($detalle != null){
+          $this->ModificarPedido($detalle, null, Pedido::ESTADO_LISTO_PARA_SERVIR);
+          $mensaje = array(
+            "mensaje" => "Pedido finalizado con exito",
+            "Detalle" => $detalle);
+        } else {
+          $mensaje = "Detalle Pedido " . $id . " Inexistente";
+        }
 
-        $this->ModificarPedido($id, $duracion, Pedido::ESTADO_LISTO_PARA_SERVIR);
-
-        $retorno = array(
-          "mensaje" => "Pedido finalizado con exito",
-          "Detalle" => $detalle);
-        $payload = json_encode($retorno);
+        $payload = json_encode($mensaje);
 
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-    public function ModificarPedido($id, $duracion, $estado)
+    public function ModificarPedido($detalle, $duracion, $estado)
     {
-        $detalle = DetallePedido::obtener($id);
-        $detalle->tiempoEstimado = $duracion;
-        $detalle->estado = $estado;
-        $detalle->guardar();
+      date_default_timezone_set('America/Argentina/Buenos_Aires');
+      $horaActual = date('H:i:s');
 
-        $pedido = Pedido::obtenerPorDeralleId($id);
-        if (Pedido::ESTADO_EN_PREPARACION === $estado && $pedido->estado !== $estado){
-          $pedido->estado = $estado;
-          $pedido->horaInicio = date('H:i:s');
-          $pedido->guardar();
-        } else if (Pedido::ESTADO_LISTO_PARA_SERVIR === $estado){
+      $pedido = Pedido::obtenerPorDetalleId($detalle->id);
+      if (Pedido::ESTADO_EN_PREPARACION == $estado){
+          $detalle->tiempoEstimado = $duracion;
+          $detalle->horaInicio = $horaActual;
+          if($pedido->estado != $estado){
+            $pedido->estado = $estado;
+            $pedido->horaInicio = $horaActual;
+            $pedido->guardar();
+          }
+        } else if (Pedido::ESTADO_LISTO_PARA_SERVIR == $estado){
           $detalles = Pedido::obtenerDetalleEnPreparacion($pedido->id);
           $listoParaServir = empty($detalles);
           if ($listoParaServir) {
             $pedido->estado = $estado;
-            $pedido->horaFin = date('H:i:s');
+            $pedido->horaFin = $horaActual;
+            $pedido->calcularImporte();
             $pedido->guardar();
           }
-        } 
+        }
+        $detalle->estado = $estado;
+        $detalle->guardar();
     }
 
     public function BorrarUno($request, $response, $args)

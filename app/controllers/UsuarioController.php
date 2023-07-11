@@ -3,6 +3,12 @@ require_once './models/Usuario.php';
 require_once './interfaces/IApiUsable.php';
 require_once 'JWTController.php';
 
+define('SECTOR_COCINA', 'Cocina');
+define('SECTOR_CERVECERIA', 'Cervecería');
+define('SECTOR_BAR', 'Barra');
+define('SECTOR_MOZO', 'Mozo');
+define('SECTOR_ADMIN', 'Admin');
+
 class UsuarioController extends Usuario implements IApiUsable
 {
     public function CargarUno($request, $response, $args)
@@ -21,7 +27,6 @@ class UsuarioController extends Usuario implements IApiUsable
         $usr->nombre = $nombre;
         $usr->apellido = $apellido;
         $usr->email = $email;
-        $usr->role_ = $this->getRole($role);
         $usr->sector = $this->getSector($sector);
         $usr->clave = password_hash($clave, PASSWORD_DEFAULT);
         $usr->guardar();
@@ -39,13 +44,11 @@ class UsuarioController extends Usuario implements IApiUsable
 
         $email = $parametros['email'];
         $clave = $parametros['clave'];
-
         $usr = Usuario::obtenerUsuarioPorEmail($email);
-
         if ($usr != null) {
             if (password_verify($clave, $usr->clave)) {
-                $token = JWTController::crearToken($usr->id, $email, $usr->tipo);
-                $mensaje = "Usuario " . $email ." Logeado correctamente.  Sector: " . $usr->tipo;
+                $token = JWTController::crearToken($usr->id, $email, $usr->sector);
+                $mensaje = "Usuario " . $email ." Logeado correctamente.  Sector: " . $usr->sector;
                 $retorno = json_encode(array("mensaje" => $mensaje));
                 $response = $response->withHeader('Authorization', $token);
             } else {
@@ -92,10 +95,6 @@ class UsuarioController extends Usuario implements IApiUsable
           ->withHeader('Content-Type', 'application/json');
     }
 
-    function getRole($role){
-      return strcasecmp(ROLL_ADMIN, $role) ? ROLL_ADMIN : ROLL_EMPLEADO;
-    }
-
     public function getSector($sector){
       if(strcasecmp(SECTOR_COCINA, $sector)){
         return SECTOR_COCINA;
@@ -105,6 +104,8 @@ class UsuarioController extends Usuario implements IApiUsable
         return SECTOR_BAR;
       } else if(strcasecmp(SECTOR_MOZO, $sector)){
         return SECTOR_MOZO;
+      } else if(strcasecmp(SECTOR_ADMIN, $sector)){
+        return SECTOR_ADMIN;
       }
 
       return null;

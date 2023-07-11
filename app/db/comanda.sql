@@ -67,6 +67,7 @@ CREATE TABLE `pedido` (
   `horaOrden` time,
   `horaInicio` time DEFAULT NULL,
   `horaFin` time DEFAULT NULL,
+  `importe` float DEFAULT NULL,
   `foto` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

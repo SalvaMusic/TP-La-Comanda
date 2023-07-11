@@ -29,14 +29,20 @@ class JWTController
         return JWT::decode($token, new Key(self::$claveSecreta, self::$tipoEncriptacion))->data;
     }
 
-    public static function validarToken($token, $tipo){
+    public static function validarToken($token, $tipos){
         $valido = false;
         try {
             $data = JWTController::ObtenerData($token);
-            if($tipo == null || $data->tipo == $tipo){
-                var_dump($data->id);
+            if (empty($tipos)) {
                 $valido =  $data->id;                
+            } else {
+                foreach ($tipos as $tipo) {
+                    if($data->tipo == $tipo){
+                        $valido =  $data->id;                
+                    }
+                }
             }
+           
         } catch (Exception $e) {   }
         return $valido;
     }

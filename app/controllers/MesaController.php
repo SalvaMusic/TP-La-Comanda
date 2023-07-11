@@ -38,6 +38,7 @@ class MesaController extends Mesa implements IApiUsable
         }
         
         if (empty($listaErrores)) {
+            $mesa->guardarEstado();
             $mensaje = "Mesa: " . $mesa->id . " | " . $mesa->estado;
             $payload = json_encode(array("mensaje" => $mensaje));
         } else {
@@ -62,6 +63,7 @@ class MesaController extends Mesa implements IApiUsable
         }
         
         if (empty($listaErrores)) {
+            $mesa->guardarEstado();
             $mensaje = "Mesa: " . $mesa->id . " | " . $mesa->estado;
             $payload = json_encode(array("mensaje" => $mensaje));
         } else {

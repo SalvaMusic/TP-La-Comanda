@@ -13,31 +13,48 @@ class Pedido
     public $horaInicio;
     public $horaFin;
     public $horaOrden;    
+    public $importe;
     public $foto;
 
     const ESTADO_PENDIENTE = 'Pendiente';
     const ESTADO_EN_PREPARACION = 'En Preparación';
     const ESTADO_LISTO_PARA_SERVIR = 'Listo Para Servir';
 
-    public function crearPedido()
+    public function guardar()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO pedido 
-            (usuarioId, cliente, estado, codPedido, mesaId, fecha, horaInicio, horaFin, horaOrden, foto) VALUES
-            (:usuarioId, :cliente, :estado, :codPedido, :mesaId, :fecha, :horaInicio, :horaFin, :horaOrden, :foto)");
-        $consulta->bindValue(':usuarioId', $this->usuarioId, PDO::PARAM_INT);
-        $consulta->bindValue(':cliente', $this->usuarioId, PDO::PARAM_STR);
+        if($this->id == null){
+            $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO pedido 
+                (usuarioId, cliente, estado, codPedido, mesaId, fecha, horaInicio, horaFin, horaOrden, foto) VALUES
+                (:usuarioId, :cliente, :estado, :codPedido, :mesaId, :fecha, :horaInicio, :horaFin, :horaOrden, :foto)");
+            
+            $consulta->bindValue(':usuarioId', $this->usuarioId, PDO::PARAM_INT);
+            $consulta->bindValue(':cliente', $this->cliente, PDO::PARAM_STR);
+            $consulta->bindValue(':codPedido', $this->codPedido, PDO::PARAM_STR);
+            $consulta->bindValue(':mesaId', $this->mesaId, PDO::PARAM_INT);
+            $consulta->bindValue(':fecha', $this->fecha);
+        } else {
+            $consulta = $objAccesoDatos->prepararConsulta(
+                "UPDATE pedido SET 
+                    estado = :estado,
+                    horaInicio = :horaInicio,
+                    horaFin = :horaFin,
+                    horaOrden = :horaOrden, 
+                    importe = :importe, 
+                    foto = :foto
+                WHERE id = :id");
+
+            $consulta->bindValue(':id', $this->id, PDO::PARAM_INT);
+            $consulta->bindValue(':importe', $this->importe);
+        }
         $consulta->bindValue(':estado', $this->estado, PDO::PARAM_STR);
-        $consulta->bindValue(':codPedido', $this->codPedido, PDO::PARAM_STR);
-        $consulta->bindValue(':mesaId', $this->mesaId, PDO::PARAM_INT);
-        $consulta->bindValue(':fecha', $this->fecha,);
         $consulta->bindValue(':horaInicio', $this->horaInicio, PDO::PARAM_STR);
         $consulta->bindValue(':horaFin', $this->horaFin, PDO::PARAM_STR);
         $consulta->bindValue(':horaOrden', $this->horaOrden, PDO::PARAM_STR);
         $consulta->bindValue(':foto', $this->foto, PDO::PARAM_STR);
         $consulta->execute();
 
-        return $objAccesoDatos->obtenerUltimoId();
+        return $this->id == null ? $objAccesoDatos->obtenerUltimoId() : $this->id;
     }
 
     public static function obtenerTodos()
@@ -51,19 +68,30 @@ class Pedido
 
     public function obtenerTiempoRestante()
     {
-        $tiempoRestantePedido = 0;
-        foreach ($this->detallePedidos as $detallePedido) {
-            if ($detallePedido->estado == DetallePedido::ESTADO_EN_PREPARACION) {
-                $horaInicio = strtotime($detallePedido->horaInicio);
-                $tiempoEstimado = strtotime($detallePedido->tiempoEstimado);
+        $tiempoRestantePedido = null;
+        if($this->detallePedidos != null && !empty($this->detallePedidos)){
+            $tiempoRestantePedido = 0;
+            foreach ($this->detallePedidos as $detallePedido) {
+                if ($detallePedido->estado == Pedido::ESTADO_EN_PREPARACION) {
+                    $horaInicio = strtotime($detallePedido->horaInicio);
+                    $tiempoEstimado = strtotime($detallePedido->tiempoEstimado);
 
-                $tiempoRestante = $horaInicio + $tiempoEstimado - time();
-                if ($tiempoRestante > $tiempoRestantePedido) {
-                    $tiempoRestantePedido = $tiempoRestante;
+                    $horaActual = strtotime(date('H:i:s'));
+                    var_dump(gmdate('H:i:s', $horaActual));
+                    $tiempoRestante = $horaActual -($horaInicio + $tiempoEstimado);
+                    if ($tiempoRestante > $tiempoRestantePedido) {
+                        $tiempoRestantePedido = $tiempoRestante;
+                    }
                 }
             }
         }
-        return $tiempoRestantePedido;
+
+        if ($tiempoRestantePedido != null) {
+            return  gmdate('H:i:s', $tiempoRestantePedido);
+        } else {
+            return "N/A";
+        }        
+
     }
 
     public static function obtenerTodosDetalles()
@@ -91,10 +119,22 @@ class Pedido
         $consulta->bindValue(':codPedido', $codPedido, PDO::PARAM_STR);
         $consulta->execute();
 
-        return $consulta->fetchObject('Pedido');
+        $pedido = $consulta->fetchObject('Pedido');
+        $detalles = DetallePedido::obtenerListaPorCodPedido($codPedido);
+
+        $pedido->detallePedidos = []; 
+        
+        foreach ($detalles as $detallePedido) {
+            if ($detallePedido->pedidoId
+             == $pedido->id) {
+                $pedido->detallePedidos[] = $detallePedido;
+            }
+        }
+
+        return $pedido;
     }
 
-    public static function obtenerPorDeralleId($detalleId)
+    public static function obtenerPorDetalleId($detalleId)
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();            
         $consulta = $objAccesoDatos->prepararConsulta(
@@ -141,39 +181,38 @@ class Pedido
 
     }
 
+    public function calcularImporte()
+    {
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $query = "SELECT SUM(p.precio * dp.cantidad) as importe FROM detalle_pedido as dp
+            JOIN pedido as p ON dp.pedidoId = p.id 
+            JOIN producto as prod ON prod.id = dp.productoId
+            WHERE p.codPedido = :codPedido";
+            
+        $consulta = $objAccesoDatos->prepararConsulta($query);
+        $consulta->bindValue(':codPedido', $this->codPedido);
+        $consulta->execute();
+
+        $result = $consulta->fetchAll(PDO::FETCH_ASSOC);
+        $this->$result['importe'];
+    }
+
     public static function obtenerPendientesDetalles($codPedido)
     {
         $pedidos = Pedido::obtenerPendientes($codPedido);
         $detallePedidos = DetallePedido::obtenerPendientes($codPedido);
 
         foreach ($pedidos as $pedido) {
-            $pedido->detallePedidos = []; // Inicializar el array detallePedidos para cada Pedido
+            $pedido->detallePedidos = []; 
         
             foreach ($detallePedidos as $detallePedido) {
                 if ($detallePedido->pedidoId == $pedido->id) {
-                    $pedido->detallePedidos[] = $detallePedido; // Agregar el DetallePedido al array detallePedidos del Pedido actual
+                    $pedido->detallePedidos[] = $detallePedido; 
                 }
             }
         }
 
         return $pedidos;
-    }
-
-
-    public static function guardarEstado($codPedido)
-    {
-        // Ver bien como es el flujo de guardar estado
-        $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT estado FROM pedido WHERE codPedido = :codPedido");
-        $consulta->bindValue(':codPedido', $codPedido, PDO::PARAM_STR);
-        $consulta->execute();
-
-        $estado = $consulta->fetchColumn();
-
-        $consulta = $objAccesoDatos->prepararConsulta("UPDATE usuario SET estado = :estado WHERE codPedido = :codPedido");
-        $consulta->bindValue(':estado', $estado, PDO::PARAM_STR);
-        $consulta->bindValue(':codPedido', $codPedido, PDO::PARAM_STR);
-        $consulta->execute();
     }
 
     public function generarCodigoPedido()
@@ -191,8 +230,17 @@ class Pedido
         return strtoupper($codigo);
     }
 
-    private function existeCodigoPedido($codigo)
+    private static function existeCodigoPedido($codPedido)
     {        
-        return (Pedido::obtenerPedido($codigo) != null);
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $query = "SELECT 1 as existe FROM pedido 
+            WHERE codPedido = :codPedido";
+            
+        $consulta = $objAccesoDatos->prepararConsulta($query);
+        $consulta->bindValue(':codPedido', $codPedido);
+        $consulta->execute();
+
+        $result = $consulta->fetchAll(PDO::FETCH_ASSOC);
+        return !empty($result);
     }
 }

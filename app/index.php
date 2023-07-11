@@ -20,6 +20,7 @@ require_once './controllers/UsuarioController.php';
 require_once './controllers/PedidoController.php';
 require_once './controllers/DetallePedidoController.php';
 require_once './controllers/MesaController.php';
+require_once './middlewares/AutenticacionMiddleware.php';
 
 // Load ENV
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
@@ -37,24 +38,38 @@ $app->addBodyParsingMiddleware();
 // Routes
 $app->group('/usuarios', function (RouteCollectorProxy $group) {
   $group->post('[/]', \UsuarioController::class . ':login');
-  $group->get('/arma/{nombreArma}', \UsuarioController::class . ':TraerUno')
-    //->add(new AutenticacionMiddleware("Admin"))
   ;
 
 });
 
 $app->group('/pedido', function (RouteCollectorProxy $group) {
-  $group->post('/cargar', \PedidoController::class . ':CargarUno');
+  $group->post('/cargar', \PedidoController::class . ':CargarUno')
+    ->add(new AutenticacionMiddleware(array("Admin", "Mozo")));
+
   $group->get('/tiempoRestante/{codPedido}', \PedidoController::class . ':TiempoRestante');
-  $group->get('/traerTodos', \DetallePedidoController::class . ':TraerTodos');
-  $group->get('/traerPendientes', \DetallePedidoController::class . ':TraerPendientes');
-  $group->put('/prepararPedido', \DetallePedidoController::class . ':PrepararPedido');
-  $group->put('/finalizarPedido', \DetallePedidoController::class . ':FinalizarPedido');
+
+  $group->get('/traerTodos', \DetallePedidoController::class . ':TraerTodos')
+    ->add(new AutenticacionMiddleware(array()));
+
+  $group->get('/traerPendientes/{codPedido}', \DetallePedidoController::class . ':TraerPendientes')
+    ->add(new AutenticacionMiddleware(array()));
+
+  $group->put('/prepararPedido/{detallePedidoId}', \DetallePedidoController::class . ':PrepararPedido')
+    ->add(new AutenticacionMiddleware(array("Cocina", "Cervecería", "Barra")));
+
+  $group->put('/finalizarPedido/{detallePedidoId}', \DetallePedidoController::class . ':FinalizarPedido')
+    ->add(new AutenticacionMiddleware(array("Cocina", "Cervecería", "Barra")));
+
 });
 
 $app->group('/mesa', function (RouteCollectorProxy $group) {
-  $group->put('/cambiarEstado/{id}', \MesaController::class . ':CambiarEstado');
-  $group->put('/cerrar/{id}', \MesaController::class . ':CerrarMesa');
+  $group->get('[/]', \MesaController::class . ':TraerTodos');
+  $group->put('/cambiarEstado/{id}', \MesaController::class . ':CambiarEstado')
+    ->add(new AutenticacionMiddleware(array("Mozo", "Cocina", "Cervecería", "Barra")));
+
+  $group->put('/cerrar/{id}', \MesaController::class . ':CerrarMesa')
+    ->add(new AutenticacionMiddleware(array("Admin")));
+
 });
 
 $app->run();

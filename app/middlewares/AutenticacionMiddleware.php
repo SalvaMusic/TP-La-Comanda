@@ -10,10 +10,10 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
     class AutenticacionMiddleware {
         
-        private $tipo;
+        private $tipos;
 
-        public function __construct($tipo){
-            $this->tipo = $tipo;
+        public function __construct($tipos){
+            $this->tipos = $tipos;
         }
 
         public function __invoke(Request $request, RequestHandler $handler) : Response
@@ -24,7 +24,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
                 $token = $request->getHeaderLine('authorization');
                 
                 if(!empty($token)){
-                    $usuarioId = JWTController::validarToken($token, $this->tipo);
+                    $usuarioId = JWTController::validarToken($token, $this->tipos);
                     
                     if($usuarioId !== false){
                         $parametros = $request->getParsedBody();
