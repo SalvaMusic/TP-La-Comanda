@@ -46,6 +46,9 @@ $app->group('/pedido', function (RouteCollectorProxy $group) {
   $group->post('/cargar', \PedidoController::class . ':CargarUno')
     ->add(new AutenticacionMiddleware(array("Admin", "Mozo")));
 
+  $group->post('/cargarFoto/{codPedido}', \PedidoController::class . ':CargarFoto')
+    ->add(new AutenticacionMiddleware(array("Admin", "Mozo")));
+
   $group->get('/tiempoRestante/{codPedido}', \PedidoController::class . ':TiempoRestante');
 
   $group->get('/traerTodos', \DetallePedidoController::class . ':TraerTodos')

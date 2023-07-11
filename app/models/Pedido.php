@@ -243,4 +243,32 @@ class Pedido
         $result = $consulta->fetchAll(PDO::FETCH_ASSOC);
         return !empty($result);
     }
+
+    public function moverFoto($fileFoto){
+        $rutaDestino = null;
+        $tempFileName = $fileFoto["tmp_name"];
+        if($tempFileName != null){
+            $directorio = './FotosPedidos/';
+            if (!is_dir($directorio)) {
+                mkdir($directorio, 0777, true);
+            }
+            $extension = pathinfo($fileFoto["name"], PATHINFO_EXTENSION);
+            $fecha = str_replace('-', '', $this->fecha);            
+            $rutaDestino = $directorio . $this->cliente . $this->codPedido .".". $extension;        
+            if(move_uploaded_file($tempFileName, $rutaDestino)){
+                $this->guardarFoto($rutaDestino);
+            }
+        }
+
+        return $rutaDestino;
+    }
+
+    public function guardarFoto($foto)
+    {
+        $objAccesoDato = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDato->prepararConsulta("UPDATE pedido SET foto = :foto WHERE id = :id");
+        $consulta->bindValue(':id', $this->id, PDO::PARAM_INT);
+        $consulta->bindValue(':foto', $foto, PDO::PARAM_INT);
+        $consulta->execute();
+    }
 }

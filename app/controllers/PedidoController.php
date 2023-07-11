@@ -60,6 +60,25 @@ class PedidoController extends Pedido implements IApiUsable
         return $response
           ->withHeader('Content-Type', 'application/json');
     }
+
+    public function CargarFoto($request, $response, $args)
+    {
+        $codPedido = $args['codPedido'];
+
+        $pedido = Pedido::obtenerPedido($codPedido);
+        
+        if ($pedido->moverFoto($_FILES["foto"])) {
+            $mensaje = "Foto cargada correctamente ";
+            $payload = json_encode(array("mensaje" => $mensaje));
+        } else {
+            $payload = json_encode("No se pudo cargar la foto");
+        }
+
+
+        $response->getBody()->write($payload);
+        return $response
+          ->withHeader('Content-Type', 'application/json');
+    }
     
     private function setMesaId(&$pedido, &$mesaId, &$listaErrores){
         $mesaId = intval($mesaId);

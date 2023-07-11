@@ -58,7 +58,6 @@ class DetallePedidoController extends DetallePedido implements IApiUsable
         $data = $request->getParsedBody();
         $id = $args['detallePedidoId'];
         $detalle = DetallePedido::obtener($id);
-echo "DetallePedido::obtener()";
         if($detalle != null){
           $this->ModificarPedido($detalle, null, Pedido::ESTADO_LISTO_PARA_SERVIR);
           $mensaje = array(
