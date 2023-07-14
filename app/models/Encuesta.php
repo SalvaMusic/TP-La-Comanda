@@ -34,11 +34,15 @@ class Encuesta
         return $consulta->fetchAll(PDO::FETCH_CLASS, 'Encuesta');
     }
 
-    public static function obtenerEncuesta($pedido)
+    public static function obtenerEncuesta($codPedido)
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT * FROM encuesta WHERE pedidoId = :pedido");
-        $consulta->bindValue(':pedido', $pedido, PDO::PARAM_STR);
+        $query = 
+            "SELECT e.* FROM encuesta e
+            JOIN pedido p ON e.pedidoId = p.id
+            WHERE p.codPedido = :codPedido";
+        $consulta = $objAccesoDatos->prepararConsulta($query);
+        $consulta->bindValue(':codPedido', $codPedido, PDO::PARAM_STR);
         $consulta->execute();
 
         return $consulta->fetchObject('Encuesta');

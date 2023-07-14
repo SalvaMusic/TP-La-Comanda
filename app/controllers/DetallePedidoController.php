@@ -7,10 +7,6 @@ require_once './interfaces/IApiUsable.php';
 
 class DetallePedidoController extends DetallePedido implements IApiUsable
 {
-    public function CargarUno($request, $response, $args) {  }
-    
-    public function TraerUno($request, $response, $args) {  } 
-
     public function TraerTodos($request, $response, $args)
     {
         $lista = Pedido::obtenerTodosDetalles();
@@ -37,14 +33,22 @@ class DetallePedidoController extends DetallePedido implements IApiUsable
         $id = $args['detallePedidoId'];
         $duracion = $data['duracion'];
         $detalle = DetallePedido::obtener($id);
-
-        if($detalle != null){
-          $this->ModificarPedido($detalle, $duracion, Pedido::ESTADO_EN_PREPARACION);
+        $sectorUsuario = ""; // Obtener Sector del usuario
+        $sectorPedido = $detalle->obtenerSector();
+        if($detalle == null){
+          $error = "Detalle Pedido " . $id . " Inexistente";
+        } else if ($sectorUsuario !=  $sectorPedido) {
+          $error = "El usuario logeado no puede tomar un pedido del sector ". $sectorPedido;
+        } else {
+          $error = $this->ModificarPedido($detalle, $duracion, Pedido::ESTADO_EN_PREPARACION);
+        }
+        
+        if($error != null){
+          $mensaje = $error;
+        } else {
           $mensaje = array(
             "mensaje" => "Pedido tomado con exito",
             "Detalle" => $detalle);
-        } else {
-          $mensaje = "Detalle Pedido " . $id . " Inexistente";
         }
 
         $payload = json_encode($mensaje);

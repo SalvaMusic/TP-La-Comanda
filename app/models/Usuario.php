@@ -8,14 +8,29 @@ class Usuario
     public $email;
     public $clave;
     public $sector;
+    public $estado;
     public $fechaRegistro;
     public $fechaBaja;
+
+    const SECTOR_COCINA = 'Cocina';
+    const SECTOR_CERVECERIA = 'Cervecería';
+    const SECTOR_BAR = 'Barra';
+    const SECTOR_MOZO = 'Mozo';
+    const SECTOR_ADMIN = 'Admin';
+
+    const ESTADO_ACTIVO = 'ACTIVO';
+    const ESTADO_SUSPENDIDO = 'SUSPENDIDO';
+    const ESTADO_DESACTIVADO = 'DESACTIVADO';
 
     public function guardar()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         if($this->id == null){
-            $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO usuario (nombre, apellido, email, clave, sector, fechaRegistro) VALUES (:nombre, :apellido, :email, :clave, :sector, :fechaRegistro)");
+            $query = 
+                "INSERT INTO usuario (nombre, apellido, email, clave, sector, estado, fechaRegistro)
+                VALUES (:nombre, :apellido, :email, :clave, :sector, :estado, :fechaRegistro)";
+            $consulta = $objAccesoDatos->prepararConsulta($query);
+            $consulta->bindValue(':estado', Usuario::ESTADO_ACTIVO);
             $consulta->bindValue(':fechaRegistro',$this->fechaRegistro);
         } else {
             $query = "UPDATE usuario SET 
@@ -61,10 +76,23 @@ class Usuario
     public static function borrarUsuario($usuario)
     {
         $objAccesoDato = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDato->prepararConsulta("UPDATE usuario SET fechaBaja = :fechaBaja WHERE id = :id");
+        $query = "UPDATE usuario SET fechaBaja = :fechaBaja, estado = :estado WHERE id = :id";
+        $consulta = $objAccesoDato->prepararConsulta($query);
+        $fecha = new DateTime(date("Y-m-d"));
+        $consulta->bindValue(':id', $usuario, PDO::PARAM_INT);
+        $consulta->bindValue(':estado', Usuario::ESTADO_DESACTIVADO, PDO::PARAM_INT);
+        $consulta->bindValue(':fechaBaja', $fecha->format("Y-m-d"));
+        $consulta->execute();
+    }
+
+    public static function suspenderUsuario($usuario)
+    {
+        $objAccesoDato = AccesoDatos::obtenerInstancia();
+        $query = "UPDATE usuario SET estado = :estado WHERE id = :id";
+        $consulta = $objAccesoDato->prepararConsulta($query);
         $fecha = new DateTime(date("d-m-Y"));
         $consulta->bindValue(':id', $usuario, PDO::PARAM_INT);
-        $consulta->bindValue(':fechaBaja', $fecha->format(DATE_FORMAT));
+        $consulta->bindValue(':estado', Usuario::ESTADO_DESACTIVADO, PDO::PARAM_INT);
         $consulta->execute();
     }
 

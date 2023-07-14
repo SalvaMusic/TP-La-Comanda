@@ -67,7 +67,6 @@ CREATE TABLE `pedido` (
   `horaOrden` time,
   `horaInicio` time DEFAULT NULL,
   `horaFin` time DEFAULT NULL,
-  `importe` float DEFAULT NULL,
   `foto` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -82,9 +81,7 @@ CREATE TABLE `detalle_pedido` (
   `pedidoId` int(11) NOT NULL,
   `productoId` int(11) NOT NULL,
   `cantidad` int(11) NOT NULL,
-  `estado` varchar(50) NOT NULL,
-  `horaInicio` time,
-  `tiempoEstimado` time DEFAULT NULL
+  `estado` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -116,9 +113,9 @@ CREATE TABLE `usuario` (
   `nombre` varchar(100) NOT NULL,
   `apellido` varchar(100) NOT NULL,
   `email` varchar(150) NOT NULL,
-  `clave` varchar(20) DEFAULT NULL,
-  `role` varchar(20) NOT NULL,
+  `clave` varchar(255) DEFAULT NULL,
   `sector` varchar(20) DEFAULT NULL,
+  `estado` varchar(20) NOT NULL,
   `fechaRegistro` date NOT NULL,
   `fechaBaja` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -162,6 +159,12 @@ ALTER TABLE `producto`
 --
 ALTER TABLE `usuario`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Constraint de la tabla `usuario`
+--
+
+ALTER TABLE `usuario` ADD CONSTRAINT `unique_email` UNIQUE (email);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -208,13 +211,39 @@ COMMIT;
 -- Volcado de datos para la tabla `usuario`
 --
 
-INSERT INTO `usuario` (`id`, `nombre`, `apellido`, `email`, `clave`, `role`, `sector`, `fechaRegistro`, `fechaBaja`) VALUES
-(1, 'Salvador', 'Pedrozo', 'salva.7693@gmail.com', '1234', 'Admin', NULL, '2022-02-26', NULL),
-(2, 'Esteban', 'Pedrozo', 'esteban@gmail.com', '1234', 'Empleado', 'Mozo', '2023-03-15', NULL),
-(3, 'Makarena', 'Jara', 'maka@gmail.com', '1234', 'Empleado', 'Barra', '2022-09-26', NULL),
-(4, 'Yesica', 'Contreras', 'yesi@gmail.com', '1234', 'Empleado', 'Cocina', '2022-11-20', NULL),
-(5, 'Ale', 'Florentin', 'ale@gmail.com', '1234', 'Empleado', 'Cervecería', '2023-02-22', NULL),
-(6, 'Esteban', 'Pedrozo', 'esteban@gmail.com', '1234', 'Empleado', 'Mozo', '2022-06-26', NULL);
+INSERT INTO `usuario` (`id`, `nombre`, `apellido`, `email`, `clave`, `sector`, `estado`, `fechaRegistro`, `fechaBaja`) VALUES
+
+(1, 'Salvador', 'Pedrozo', 'salva@gmail.com',
+  '$2y$10$LzuGTUOdHXFdN60Ag0QtGezmy6Bxk5WRV0uT8TFVqGTwQvRZec1Lu', -- Clave: 1234
+  'ACTIVO', 'Admin', '2022-02-26', NULL),
+
+(2, 'Esteban', 'Pedrozo', 'esteban@gmail.com',
+  '$2y$10$LzuGTUOdHXFdN60Ag0QtGezmy6Bxk5WRV0uT8TFVqGTwQvRZec1Lu', -- Clave: 1234
+  'ACTIVO', 'Mozo', '2023-03-15', NULL),
+
+(3, 'Makarena', 'Jara', 'maka@gmail.com',
+  '$2y$10$LzuGTUOdHXFdN60Ag0QtGezmy6Bxk5WRV0uT8TFVqGTwQvRZec1Lu', -- Clave: 1234
+  'ACTIVO', 'Barra', '2022-09-26', NULL),
+
+(4, 'Yesica', 'Contreras', 'yesi@gmail.com',
+  '$2y$10$LzuGTUOdHXFdN60Ag0QtGezmy6Bxk5WRV0uT8TFVqGTwQvRZec1Lu', -- Clave: 1234
+  'ACTIVO', 'Cocina', '2022-11-20', NULL),
+
+(5, 'Ale', 'Florentin', 'ale@gmail.com',
+  '$2y$10$LzuGTUOdHXFdN60Ag0QtGezmy6Bxk5WRV0uT8TFVqGTwQvRZec1Lu', -- Clave: 1234
+  'ACTIVO', 'Cervecería', '2023-02-22', NULL),
+
+(6, 'Gustavo', 'Pedrozo', 'gustavo@gmail.com',
+  '$2y$10$LzuGTUOdHXFdN60Ag0QtGezmy6Bxk5WRV0uT8TFVqGTwQvRZec1Lu', -- Clave: 1234
+  'ACTIVO', 'Mozo', '2022-06-26', NULL),
+
+(7, 'Juan', 'More', 'juan@gmail.com',
+  '$2y$10$LzuGTUOdHXFdN60Ag0QtGezmy6Bxk5WRV0uT8TFVqGTwQvRZec1Lu', -- Clave: 1234
+  'SUSPENDIDO', 'Mozo', '2022-06-26', NULL),
+
+(8, 'Daniel', 'Gutierrez', 'dani@gmail.com',
+  '$2y$10$LzuGTUOdHXFdN60Ag0QtGezmy6Bxk5WRV0uT8TFVqGTwQvRZec1Lu', -- Clave: 1234
+  'DESACTIVADO', 'Cervecería', '2022-07-02', '2023-03-08');
 
 
 INSERT INTO `producto` (`id`, `nombre`, `sector`, `precio`, `stock`) VALUES

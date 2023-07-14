@@ -10,10 +10,9 @@ class Pedido
     public $mesaId;
     public $detallePedidos;
     public $fecha;
+    public $horaOrden;    
     public $horaInicio;
     public $horaFin;
-    public $horaOrden;    
-    public $importe;
     public $foto;
 
     const ESTADO_PENDIENTE = 'Pendiente';
@@ -40,12 +39,10 @@ class Pedido
                     horaInicio = :horaInicio,
                     horaFin = :horaFin,
                     horaOrden = :horaOrden, 
-                    importe = :importe, 
                     foto = :foto
                 WHERE id = :id");
 
             $consulta->bindValue(':id', $this->id, PDO::PARAM_INT);
-            $consulta->bindValue(':importe', $this->importe);
         }
         $consulta->bindValue(':estado', $this->estado, PDO::PARAM_STR);
         $consulta->bindValue(':horaInicio', $this->horaInicio, PDO::PARAM_STR);
@@ -77,7 +74,6 @@ class Pedido
                     $tiempoEstimado = strtotime($detallePedido->tiempoEstimado);
 
                     $horaActual = strtotime(date('H:i:s'));
-                    var_dump(gmdate('H:i:s', $horaActual));
                     $tiempoRestante = $horaActual -($horaInicio + $tiempoEstimado);
                     if ($tiempoRestante > $tiempoRestantePedido) {
                         $tiempoRestantePedido = $tiempoRestante;
@@ -100,11 +96,11 @@ class Pedido
         $detallePedidos = DetallePedido::obtenerTodos();
 
         foreach ($pedidos as $pedido) {
-            $pedido->detallePedidos = []; // Inicializar el array detallePedidos para cada Pedido
+            $pedido->detallePedidos = []; 
         
             foreach ($detallePedidos as $detallePedido) {
                 if ($detallePedido->pedidoId == $pedido->id) {
-                    $pedido->detallePedidos[] = $detallePedido; // Agregar el DetallePedido al array detallePedidos del Pedido actual
+                    $pedido->detallePedidos[] = $detallePedido;
                 }
             }
         }
@@ -125,8 +121,7 @@ class Pedido
         $pedido->detallePedidos = []; 
         
         foreach ($detalles as $detallePedido) {
-            if ($detallePedido->pedidoId
-             == $pedido->id) {
+            if ($detallePedido->pedidoId == $pedido->id) {
                 $pedido->detallePedidos[] = $detallePedido;
             }
         }
@@ -194,7 +189,7 @@ class Pedido
         $consulta->execute();
 
         $result = $consulta->fetchAll(PDO::FETCH_ASSOC);
-        $this->$result['importe'];
+        return $result['importe'];
     }
 
     public static function obtenerPendientesDetalles($codPedido)

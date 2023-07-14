@@ -7,34 +7,27 @@ class DetallePedido
     public $productoId;
     public $cantidad;
     public $estado;
-    public $horaInicio;
-    public $tiempoEstimado;
-
 
     public function guardar()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         if($this->id == null){
             $consulta = $objAccesoDatos->prepararConsulta(
-                "INSERT INTO detalle_pedido (pedidoId, productoId, cantidad, estado, horaInicio, tiempoEstimado) 
-                VALUES (:pedidoId, :productoId, :cantidad, :estado, :horaInicio, :tiempoEstimado)");
+                "INSERT INTO detalle_pedido (pedidoId, productoId, cantidad, estado) 
+                VALUES (:pedidoId, :productoId, :cantidad, :estado)");
             $consulta->bindValue(':pedidoId', $this->pedidoId, PDO::PARAM_INT);
         } else {
             $consulta = $objAccesoDatos->prepararConsulta(
                 "UPDATE detalle_pedido SET 
                     estado = :estado,
                     productoId = :productoId,
-                    cantidad = :cantidad, 
-                    tiempoEstimado = :tiempoEstimado,
-                    horaInicio = :horaInicio
+                    cantidad = :cantidad
                 WHERE id = :id");
             $consulta->bindValue(':id', $this->id, PDO::PARAM_INT);
         }
         $consulta->bindValue(':productoId', $this->productoId, PDO::PARAM_INT);
         $consulta->bindValue(':cantidad', $this->cantidad, PDO::PARAM_INT);
         $consulta->bindValue(':estado', $this->estado, PDO::PARAM_STR);
-        $consulta->bindValue(':horaInicio', $this->horaInicio, PDO::PARAM_STR);
-        $consulta->bindValue(':tiempoEstimado', $this->tiempoEstimado, PDO::PARAM_STR);
         $consulta->execute();
 
         return $objAccesoDatos->obtenerUltimoId();
@@ -77,6 +70,19 @@ class DetallePedido
         $consulta->execute();
 
         return $consulta->fetchAll(PDO::FETCH_CLASS, 'DetallePedido');
+    }
+
+    public function obtenerSector()
+    {
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $query = "SELECT prod.sector FROM producto as prod 
+            WHERE prod.id = :productoId";
+            
+        $consulta = $objAccesoDatos->prepararConsulta($query);
+        $consulta->bindValue(':productoId', $this->productoId);
+        $consulta->execute();
+
+        return $consulta->fetchColumn();
     }
 
     public static function obtenerListaPorCodPedido($codPedido)
