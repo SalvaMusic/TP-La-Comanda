@@ -82,7 +82,7 @@ class Usuario
         $consulta->bindValue(':id', $usuario, PDO::PARAM_INT);
         $consulta->bindValue(':estado', Usuario::ESTADO_DESACTIVADO, PDO::PARAM_INT);
         $consulta->bindValue(':fechaBaja', $fecha->format("Y-m-d"));
-        $consulta->execute();
+        return $consulta->execute();
     }
 
     public static function suspenderUsuario($usuario)

@@ -134,18 +134,6 @@ class PedidoController extends Pedido implements IApiUsable
         return $response
           ->withHeader('Content-Type', 'application/json');
     }
-
-    public function FiltrarNacionalidadFecha($request, $response, $args)
-    {
-        $pais = 'EEUU';
-        $fechaInicio = '2022-11-13';
-        $fechaFin = '2022-11-16';
-        $lista = Venta::obtenerTodosPaisFecha($pais, $fechaInicio, $fechaFin);
-        $payload = json_encode(array("lista Ventas Armas EEUU y fecha" => $lista));
-
-        $response->getBody()->write($payload);
-        return $response->withHeader('Content-Type', 'application/json');
-    }
     
     public function ModificarUno($request, $response, $args)
     {

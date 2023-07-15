@@ -13,6 +13,7 @@ class Pedido
     public $horaOrden;    
     public $horaInicio;
     public $horaFin;
+    public $tiempoEstimado;
     public $foto;
 
     const ESTADO_PENDIENTE = 'Pendiente';
@@ -24,8 +25,8 @@ class Pedido
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         if($this->id == null){
             $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO pedido 
-                (usuarioId, cliente, estado, codPedido, mesaId, fecha, horaInicio, horaFin, horaOrden, foto) VALUES
-                (:usuarioId, :cliente, :estado, :codPedido, :mesaId, :fecha, :horaInicio, :horaFin, :horaOrden, :foto)");
+                (usuarioId, cliente, estado, codPedido, mesaId, fecha, horaInicio, horaFin, horaOrden, tiempoEstimado, foto) VALUES
+                (:usuarioId, :cliente, :estado, :codPedido, :mesaId, :fecha, :horaInicio, :horaFin, :horaOrden, :tiempoEstimado, :foto)");
             
             $consulta->bindValue(':usuarioId', $this->usuarioId, PDO::PARAM_INT);
             $consulta->bindValue(':cliente', $this->cliente, PDO::PARAM_STR);
@@ -39,6 +40,7 @@ class Pedido
                     horaInicio = :horaInicio,
                     horaFin = :horaFin,
                     horaOrden = :horaOrden, 
+                    tiempoEstimado = :tiempoEstimado, 
                     foto = :foto
                 WHERE id = :id");
 
@@ -48,6 +50,7 @@ class Pedido
         $consulta->bindValue(':horaInicio', $this->horaInicio, PDO::PARAM_STR);
         $consulta->bindValue(':horaFin', $this->horaFin, PDO::PARAM_STR);
         $consulta->bindValue(':horaOrden', $this->horaOrden, PDO::PARAM_STR);
+        $consulta->bindValue(':tiempoEstimado', $this->tiempoEstimado, PDO::PARAM_STR);
         $consulta->bindValue(':foto', $this->foto, PDO::PARAM_STR);
         $consulta->execute();
 
@@ -63,15 +66,15 @@ class Pedido
         return $consulta->fetchAll(PDO::FETCH_CLASS, 'Pedido');
     }
 
-    public function obtenerTiempoRestante()
+    public static function obtenerTiempoRestante()
     {
         $tiempoRestantePedido = null;
-        if($this->detallePedidos != null && !empty($this->detallePedidos)){
+        // if($this->detallePedidos != null && !empty($this->detallePedidos)){
             $tiempoRestantePedido = 0;
-            foreach ($this->detallePedidos as $detallePedido) {
-                if ($detallePedido->estado == Pedido::ESTADO_EN_PREPARACION) {
-                    $horaInicio = strtotime($detallePedido->horaInicio);
-                    $tiempoEstimado = strtotime($detallePedido->tiempoEstimado);
+            // foreach ($this->detallePedidos as $detallePedido) {
+                if ('' == Pedido::ESTADO_EN_PREPARACION) {
+                    $horaInicio = '';
+                    $tiempoEstimado = '';
 
                     $horaActual = strtotime(date('H:i:s'));
                     $tiempoRestante = $horaActual -($horaInicio + $tiempoEstimado);
@@ -79,8 +82,8 @@ class Pedido
                         $tiempoRestantePedido = $tiempoRestante;
                     }
                 }
-            }
-        }
+        //     }
+        // }
 
         if ($tiempoRestantePedido != null) {
             return  gmdate('H:i:s', $tiempoRestantePedido);

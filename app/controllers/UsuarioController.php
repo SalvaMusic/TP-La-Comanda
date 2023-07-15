@@ -68,8 +68,7 @@ class UsuarioController extends Usuario implements IApiUsable
     $payload = json_encode(array("listaUsuario" => $lista));
 
     $response->getBody()->write($payload);
-    return $response
-      ->withHeader('Content-Type', 'application/json');
+    return $response->withHeader('Content-Type', 'application/json');
   }
 
   public function ModificarUno($request, $response, $args) {  }
@@ -79,8 +78,8 @@ class UsuarioController extends Usuario implements IApiUsable
     $parametros = $request->getParsedBody();
 
     $usuarioId = $parametros['usuarioId'];
-    Usuario::borrarUsuario($usuarioId);
-
+    $retorno = Usuario::borrarUsuario($usuarioId);
+    var_dump($retorno);
     $payload = json_encode(array("mensaje" => "Usuario borrado con exito"));
 
     $response->getBody()->write($payload);
@@ -88,7 +87,20 @@ class UsuarioController extends Usuario implements IApiUsable
       ->withHeader('Content-Type', 'application/json');
   }
 
-  public function getSector($sector)
+  public function Suspender($request, $response, $args)
+  {
+    $parametros = $request->getParsedBody();
+
+    $usuarioId = $parametros['usuarioId'];
+    $retorno = Usuario::suspenderUsuario($usuarioId);
+    var_dump($retorno);
+    $payload = json_encode(array("mensaje" => "Usuario Suspendido con exito"));
+
+    $response->getBody()->write($payload);
+    return $response->withHeader('Content-Type', 'application/json');
+  }
+
+  private function getSector($sector)
   {
     if (strcasecmp(Usuario::SECTOR_COCINA, $sector)) {
       return Usuario::SECTOR_COCINA;
